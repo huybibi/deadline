@@ -31,7 +31,24 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 
 ## Tải bản chạy trực tiếp
 
-- **Bản portable**: [deadline-0.1.0-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
+- **Windows (portable)**: [deadline-0.1.0-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
+- **macOS — Apple Silicon (M1/M2/M3/M4)**: [deadline-0.1.0-mac-arm64.dmg](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-mac-arm64.dmg) (~127MB)
+- **macOS — Intel**: [deadline-0.1.0-mac-x64.dmg](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-mac-x64.dmg) (~134MB)
+
+Không rõ máy nào? Mở menu Apple (góc trên trái) → **About This Mac**: thấy **Apple M…** thì tải bản arm64, thấy **Intel Core** thì tải bản x64.
+
+**Cài trên macOS**: mở file `.dmg` → kéo **deadline** vào thư mục **Applications**.
+
+Bản mac chưa mua chứng chỉ Apple nên chưa notarize; lần đầu mở macOS sẽ cảnh báo *"unidentified developer"*:
+
+1. Mở **Applications**, bấm chuột phải (hoặc Control-click) vào **deadline** → **Open** → **Open**.
+2. Nếu vẫn bị chặn, mở **Terminal** gõ:
+
+```
+xattr -cr /Applications/deadline.app
+```
+
+Chỉ cần làm một lần cho mỗi lần tải về. App chạy trên cả Intel và Apple Silicon (build riêng cho từng loại, macOS 10.15+).
 
 ## Dùng hằng ngày
 
