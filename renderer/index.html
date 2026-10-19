@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'">
+<title>deadline</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="mode-button">
+  <!-- nút lơ lửng -->
+  <div id="widget"><span class="widget-label">deadline</span></div>
+
+  <!-- bảng xếp hạng + chi tiết -->
+  <div id="panel">
+    <div class="panel-header" id="panel-drag">
+      <span class="panel-title">deadline</span>
+      <span class="header-spacer"></span>
+      <button id="btn-add" class="btn-small" title="Thêm task">+</button>
+      <button id="btn-hide" class="btn-small" title="Thu nhỏ (Esc)">×</button>
+    </div>
+    <div class="panel-body">
+      <div id="col-list">
+        <div id="view-list" class="view">
+          <div id="task-list"></div>
+          <div id="delivered-wrap" class="hidden">
+            <div class="section-label">Đã giao — chờ phản hồi</div>
+            <div id="delivered-list"></div>
+          </div>
+          <div id="empty-state" class="hidden">Chưa có task. Bấm + để thêm.</div>
+        </div>
+        <div id="view-form" class="view hidden">
+          <div class="form-title" id="form-title">Thêm task</div>
+          <label class="field">tên dự án
+            <input id="f-name" type="text" autocomplete="off" spellcheck="false">
+          </label>
+          <label class="field">hạn giao khách (vd: 15/3)
+            <span class="date-pair" id="f-deadline">
+              <input class="d-text" type="text" placeholder="15/3" autocomplete="off" spellcheck="false">
+            </span>
+          </label>
+          <div class="field-label">các bước làm (tên bước — người phụ trách)</div>
+          <div id="f-stages"></div>
+          <button id="btn-add-stage" class="btn-line" type="button">+ bước</button>
+          <div id="f-error" class="form-error hidden"></div>
+          <div class="form-actions">
+            <button id="btn-save-task" class="btn-line strong" type="button">Lưu</button>
+            <button id="btn-cancel-form" class="btn-line" type="button">Huỷ</button>
+          </div>
+        </div>
+      </div>
+      <div id="col-detail" class="hidden"></div>
+    </div>
+    <div class="panel-footer">
+      <span class="footer-label" title="Độ đậm nền bảng">nền</span>
+      <input id="scrim-slider" type="range" min="0" max="90" step="5" value="35">
+    </div>
+  </div>
+
+  <!-- điểm nắm đổi kích thước bảng (4 cạnh + 4 góc) -->
+  <div class="rs rs-n" data-rs="n"></div>
+  <div class="rs rs-s" data-rs="s"></div>
+  <div class="rs rs-e" data-rs="e"></div>
+  <div class="rs rs-w" data-rs="w"></div>
+  <div class="rs rs-ne" data-rs="ne"></div>
+  <div class="rs rs-nw" data-rs="nw"></div>
+  <div class="rs rs-se" data-rs="se"></div>
+  <div class="rs rs-sw" data-rs="sw"></div>
+
+  <!-- menu chuột phải -->
+  <div id="ctx-menu" class="hidden">
+    <div class="ctx-item" id="ctx-hide">Ẩn widget (Ctrl+Alt+D)</div>
+    <div class="ctx-item" id="ctx-quit">Thoát</div>
+  </div>
+
+  <script src="../util.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

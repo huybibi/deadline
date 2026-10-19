@@ -1,0 +1,16 @@
+{
+  "name": "deadline-widget",
+  "productName": "deadline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Widget quản lý deadline — bảng xếp hạng task theo hạn giao khách",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test store.test.js"
+  },
+  "devDependencies": {
+    "electron": "^44.9.0",
+    "playwright": "^1.64.1"
+  }
+}
