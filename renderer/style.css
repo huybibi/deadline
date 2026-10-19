@@ -94,7 +94,12 @@ body.mode-detail #col-list {
 
 #col-detail {
   flex: 1;
-  min-width: 0;
+  /* Tối thiểu 360px (đo với dữ liệu thật: hàng bước rộng nhất 214px, nút dài
+     nhất "Khách yêu cầu chỉnh sửa" 184px, header 217px). Trước đây là
+     min-width: 0 nên khi cửa sổ bị kéo hẹp, cột này bị ép về 0 — chỉ còn lại
+     viền 1px, chữ bẻ từng ký tự và đẩy thanh cuộn. Cửa sổ cũng bị chặn không
+     cho hẹp hơn ngưỡng tương ứng (DETAIL_MIN_WIDTH trong main.js). */
+  min-width: 360px;
   border-left: 1px solid rgba(255, 255, 255, 0.4);
   padding-left: 12px;
   overflow-y: auto;
@@ -148,6 +153,9 @@ body.detail-left #col-detail {
   cursor: pointer;
   font-family: inherit;
   font-size: 12px;
+  /* nhãn nút không bẻ giữa chừng: hàng nút (.detail-actions) đã flex-wrap nên
+     nút tự xuống dòng nguyên khối */
+  white-space: nowrap;
 }
 .btn-line:hover:not(:disabled) { background: rgba(255, 255, 255, 0.15); }
 .btn-line:disabled { opacity: 0.35; cursor: default; }

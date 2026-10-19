@@ -14,6 +14,15 @@ const SIZES = {
   detail: { width: 920, height: 660 },
 };
 const MIN_EXPANDED = { width: 380, height: 420 };
+// Chi tiết gồm 2 cột: danh sách 340px + khe 12px + cột chi tiết tối thiểu 360px
+// (xem #col-detail trong style.css) + viền/padding panel 22px. Chặn cửa sổ không
+// cho hẹp hơn ngưỡng này, nếu không cột chi tiết bị ép về 0 (chỉ còn viền 1px).
+const DETAIL_MIN_WIDTH = 340 + 12 + 360 + 22;
+
+// chiều rộng nhỏ nhất của cửa sổ theo chế độ (chi tiết phải đủ chỗ cho 2 cột)
+function minWidthFor(m) {
+  return m === 'detail' ? DETAIL_MIN_WIDTH : MIN_EXPANDED.width;
+}
 
 let win = null;
 let tray = null;
@@ -44,7 +53,9 @@ function loadLayout() {
     const pb = raw.panel || {};
     const db = raw.detail || {};
     if (Number.isFinite(pb.width) && pb.width >= MIN_EXPANDED.width) layout.panelWidth = pb.width;
-    if (Number.isFinite(db.width) && db.width >= MIN_EXPANDED.width) layout.detailWidth = db.width;
+    if (Number.isFinite(db.width) && db.width >= MIN_EXPANDED.width) {
+      layout.detailWidth = Math.max(db.width, DETAIL_MIN_WIDTH);
+    }
     const h = Number.isFinite(raw.height) ? raw.height
       : Number.isFinite(pb.height) ? pb.height
       : db.height;
@@ -142,7 +153,7 @@ function setMode(next) {
     }
   } else {
     // mở chi tiết: chiều rộng riêng, chiều cao giữ nguyên (đồng bộ với bảng)
-    w = layout.detailWidth || SIZES.detail.width;
+    w = Math.max(layout.detailWidth || SIZES.detail.width, DETAIL_MIN_WIDTH);
     h = cur.height;
     panelBounds = { x: cur.x, y: cur.y, width: cur.width, height: cur.height };
     detailSide = cur.x + w <= wa.x + wa.width ? 'right' : 'left';
@@ -281,9 +292,11 @@ ipcMain.on('widget:set-position', (_e, x, y, w, h) => {
   // bảng: dùng kích thước chụp lúc bắt đầu kéo (chống phình DPI), thiếu thì giữ hiện tại
   let s;
   if (mode === 'button') s = SIZES.button;
-  else if (Number.isFinite(w) && Number.isFinite(h) &&
-           w >= MIN_EXPANDED.width && h >= MIN_EXPANDED.height) {
-    s = { width: Math.round(w), height: Math.round(h) };
+  else if (Number.isFinite(w) && Number.isFinite(h)) {
+    s = {
+      width: Math.max(Math.round(w), minWidthFor(mode)),
+      height: Math.max(Math.round(h), MIN_EXPANDED.height),
+    };
   } else s = { width: cur.width, height: cur.height };
   const p = clamp(Math.round(x), Math.round(y), s.width, s.height);
   win.setBounds({ x: p.x, y: p.y, width: s.width, height: s.height });
@@ -302,7 +315,7 @@ ipcMain.on('widget:set-bounds', (_e, b) => {
   // thiếu/garbage x,y (gọi tay, DPI glitch) → giữ vị trí hiện tại, không để NaN
   const nx = Number.isFinite(b.x) ? Math.round(b.x) : cur.x;
   const ny = Number.isFinite(b.y) ? Math.round(b.y) : cur.y;
-  const w = Math.min(Math.max(Math.round(b.width), MIN_EXPANDED.width), wa.width);
+  const w = Math.min(Math.max(Math.round(b.width), minWidthFor(mode)), wa.width);
   const h = Math.min(Math.max(Math.round(b.height), MIN_EXPANDED.height), wa.height);
   const p = clamp(nx, ny, w, h);
   win.setBounds({ x: p.x, y: p.y, width: w, height: h });

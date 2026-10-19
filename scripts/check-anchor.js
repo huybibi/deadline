@@ -4,6 +4,7 @@
 // - ghim góc trên-trái, nút luôn về đúng home sau khi tắt/kéo bảng
 // - chiều cao đồng bộ giữa 2 trạng thái, chiều rộng riêng từng trạng thái
 // - chi tiết nở phải khi đủ chỗ, nở trái (cột chi tiết bên trái) khi thiếu chỗ
+// - cột chi tiết có ngưỡng tối thiểu, không bị ép về 1px khi cửa sổ hẹp hết cỡ
 // Chạy: node scripts/check-anchor.js
 
 const path = require('node:path');
@@ -171,6 +172,49 @@ const { _electron: electron } = require('playwright');
     'khởi động lại ở mép phải: chi tiết vẫn nhận biết nở trái');
   await app.close();
   console.log('ok - khoi dong lai: luu dung rong rieng + cao chung');
+
+  // 9. cột chi tiết có ngưỡng tối thiểu: kéo cửa sổ hẹp hết cỡ ở chế độ chi tiết
+  //    thì cửa sổ dừng ở 734px, cột chi tiết vẫn >= 360px — không tràn ngang,
+  //    không bẻ chữ ở hàng bước / hàng nút, không sinh thanh cuộn dọc
+  app = await launch();
+  win = await app.firstWindow();
+  await win.waitForSelector('#widget', { timeout: 15000 });
+  await win.click('#widget');
+  await win.waitForSelector('body.mode-panel');
+  await openDetail();
+  const beforeMin = await getWin();
+  await apiBounds({ x: beforeMin.x, y: beforeMin.y, width: 380, height: 750 });
+  await win.waitForTimeout(400);
+  const dMin = await getWin();
+  assert.strictEqual(dMin.width, 340 + 12 + 360 + 22,
+    'kéo chi tiết hẹp hết cỡ: cửa sổ dừng ở ngưỡng 2 cột');
+  const min = await win.evaluate(() => {
+    const d = document.querySelector('#col-detail');
+    const range = document.createRange();
+    const lines = (el) => {
+      let n = 0;
+      for (const c of el.childNodes) {
+        if (c.nodeType === 3 && c.textContent.trim()) {
+          range.selectNodeContents(c);
+          n = Math.max(n, range.getClientRects().length);
+        }
+      }
+      return n;
+    };
+    const r = { w: d.getBoundingClientRect().width, overflow: 0, wrapBad: 0, scroll: d.scrollHeight - d.clientHeight };
+    for (const el of d.querySelectorAll('*')) if (el.scrollWidth > el.clientWidth + 1) r.overflow++;
+    for (const sel of ['.stage-label', '.stage-owner', '.stage-status', '.detail-meta']) {
+      for (const el of d.querySelectorAll(sel)) if (lines(el) > 1) r.wrapBad++;
+    }
+    for (const b of d.querySelectorAll('button')) if (lines(b) > 1) r.wrapBad++;
+    return r;
+  });
+  assert.ok(min.w >= 360, `cột chi tiết >= 360px (được ${Math.round(min.w)}px)`);
+  assert.strictEqual(min.overflow, 0, 'hẹp nhất: không tràn ngang');
+  assert.strictEqual(min.wrapBad, 0, 'hẹp nhất: không bẻ chữ ở hàng bước / hàng nút');
+  assert.ok(min.scroll <= 0, `hẹp nhất: không thanh cuộn dọc (thừa ${min.scroll}px)`);
+  await app.close();
+  console.log('ok - cot chi tiet co nguong toi thieu, khong bi ep ve 1px');
 
   console.log('\nANCHOR: TAT CA PASS');
 })().catch((e) => {
