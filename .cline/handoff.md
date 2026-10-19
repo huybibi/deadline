@@ -1,5 +1,5 @@
 # Bàn giao — Widget "deadline" (quản lý deadline cho account manager)
-_Cập nhật: 19/10/2026 (bản vá phản hồi thứ 4)_
+_Cập nhật: 19/10/2026 (bản vá phản hồi thứ 5 + đóng gói)_
 
 ## Tóm tắt
 App v1 + 4 vòng vá theo phản hồi người dùng. Kiểm thử: 4/4 unit + 15/15 E2E + 8/8 check ghim góc (`scripts/check-anchor.js`) pass. Vòng 1: kéo/resize bảng, thêm bước phát sinh. Vòng 2: chống trôi kích thước khi kéo, bỏ dòng nhắc, ô hạn ngày/tháng (năm tự suy), tray icon + Thoát + khởi động cùng Windows, shortcut desktop, bộ icon, thanh độ đậm nền. Vòng 3: viền nút/bảng đủ 4 cạnh (chống xén DPI: cửa sổ nút 152×46, `#widget`/`#panel` vẽ `position:absolute; inset:1px`, html/body 100%×100%). Vòng 4: đổi ghim góc từ trên-phải sang **trên-trái** — sửa 2 bug nhảy vị trí: (1) tắt bảng sau khi kéo → nút trôi theo mép phải bảng, mở lại bảng hiện "vị trí cuối cùng" thay vì tại nút; (2) mở/thu chi tiết → cửa sổ nở/trả sang trái 380px làm cột danh sách nhảy; (3) đồng bộ **chiều cao** chung 2 trạng thái (thu gọn/mở chi tiết), chiều rộng riêng từng trạng thái; chi tiết nở **phải** khi đủ chỗ (danh sách giữ mép trái) hoặc nở **trái** khi bảng gần mép phải màn hình (cột chi tiết bên trái danh sách, danh sách giữ mép phải — class `detail-left` lật cột qua CSS `flex-direction: row-reverse`).
@@ -33,3 +33,8 @@ App v1 + 4 vòng vá theo phản hồi người dùng. Kiểm thử: 4/4 unit + 
 1. Người dùng dùng thử tiếp, tổng hợp phản hồi vòng 3.
 2. Khi được yêu cầu: đóng gói `.exe` portable bằng electron-builder (lúc đó tray "Khởi động cùng Windows" tự đúng path, shortcut nên trỏ thẳng .exe).
 3. Nếu người dùng muốn nhân viên tự cập nhật sau này: thiết kế dữ liệu đã sẵn sàng, xem lại lựa chọn "trang web chung" trong `plans/deadline-widget.md`.
+
+## Cập nhật phiên 19/10/2026 (phản hồi 5 + đóng gói)
+- Ô hạn: đổi 2 select ngày/tháng thành **ô nhập tự do** (`15/3` hoặc `15/3/2027`), hàm `util.parseDateVN` nhận `/ - . khoảng trắng` + năm 2 chữ số; không gõ năm tự suy như cũ; sai ngày (31/2) báo lỗi. Unit 7/7, E2E 15/15, anchor 3/3 pass.
+- Git: repo khởi tạo trong thư mục dự án, remote `origin` = https://github.com/huybibi/deadline (private, tạo bằng token từ Git Credential Manager — `gh` CLI không dùng được vì token thiếu scope `read:org`).
+- Đóng gói: `npm run dist` (electron-builder, target portable x64) → `dist/deadline-0.1.0-portable.exe` (~100MB). Đã sửa `main.js` đăng ký "Khởi động cùng Windows" theo `app.isPackaged`. Release v0.1.0 đính kèm exe: https://github.com/huybibi/deadline/releases/tag/v0.1.0. Bước kế tiếp 2 (đóng gói) hoàn thành.
