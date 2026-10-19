@@ -270,7 +270,7 @@ function createTray() {
   } catch (_) {
     return; // thiếu file icon thì chạy tiếp không tray (Ctrl+Alt+D vẫn hoạt động)
   }
-  tray.setToolTip('deadline');
+  tray.setToolTip('Deadline');
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: 'Hiện / Ẩn widget (Ctrl+Alt+D)', click: toggleWidget },
     { type: 'separator' },

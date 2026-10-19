@@ -195,7 +195,7 @@ function renderDetail() {
       '<button id="btn-done" class="btn-line">Hoàn tất</button>' +
     '</div>' +
     '<div id="revision-form" class="hidden">' +
-      '<div class="field-label">vòng chỉnh sửa lần ' + (maxRevision(t) + 1) + ':</div>' +
+      '<div class="field-label">Vòng chỉnh sửa lần ' + (maxRevision(t) + 1) + ':</div>' +
       '<div id="r-stages"></div>' +
       '<button id="btn-add-rev-stage" class="btn-line" type="button">+ bước</button>' +
       '<label class="field">Hạn nộp lại (ngày/tháng)' +
@@ -207,7 +207,7 @@ function renderDetail() {
       '</div>' +
     '</div>' +
     '<div id="add-stage-form" class="hidden">' +
-      '<div class="field-label">bước phát sinh mới:</div>' +
+      '<div class="field-label">Bước phát sinh mới:</div>' +
       '<div id="a-stages"></div>' +
       '<button id="btn-add-a-stage" class="btn-line" type="button">+ bước</button>' +
       '<div class="form-actions">' +
