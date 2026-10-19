@@ -21,6 +21,7 @@
       "preload.js",
       "store.js",
       "util.js",
+      "seed.js",
       "renderer/**",
       "assets/icon.ico"
     ],
