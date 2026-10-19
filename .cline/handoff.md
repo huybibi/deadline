@@ -38,3 +38,6 @@ App v1 + 4 vòng vá theo phản hồi người dùng. Kiểm thử: 4/4 unit + 
 - Ô hạn: đổi 2 select ngày/tháng thành **ô nhập tự do** (`15/3` hoặc `15/3/2027`), hàm `util.parseDateVN` nhận `/ - . khoảng trắng` + năm 2 chữ số; không gõ năm tự suy như cũ; sai ngày (31/2) báo lỗi. Unit 7/7, E2E 15/15, anchor 3/3 pass.
 - Git: repo khởi tạo trong thư mục dự án, remote `origin` = https://github.com/huybibi/deadline (private, tạo bằng token từ Git Credential Manager — `gh` CLI không dùng được vì token thiếu scope `read:org`).
 - Đóng gói: `npm run dist` (electron-builder, target portable x64) → `dist/deadline-0.1.0-portable.exe` (~100MB). Đã sửa `main.js` đăng ký "Khởi động cùng Windows" theo `app.isPackaged`. Release v0.1.0 đính kèm exe: https://github.com/huybibi/deadline/releases/tag/v0.1.0. Bước kế tiếp 2 (đóng gói) hoàn thành.
+- README: thêm 4 ảnh chụp màn hình (nút/bảng/thêm/chi tiết) + mô tả cho repo public; link tải bản portable trong README trỏ thẳng đến release v0.1.0.
+- GitHub: repo huybibi/deadline đã **public**, code + ảnh + README đã đẩy.
+- Khởi động cùng Windows: **không có đăng ký nào** trên máy (registry HKCU/HKLM + Startup folder đều sạch) — user sẽ chạy bản .exe, không cần tính năng này.
