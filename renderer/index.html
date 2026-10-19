@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'">
-<title>deadline</title>
+<title>Deadline</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="mode-button">
   <!-- nút lơ lửng -->
-  <div id="widget"><span class="widget-label">deadline</span></div>
+  <div id="widget"><span class="widget-label">Deadline</span></div>
 
   <!-- bảng xếp hạng + chi tiết -->
   <div id="panel">
     <div class="panel-header" id="panel-drag">
-      <span class="panel-title">deadline</span>
+      <span class="panel-title">Deadline</span>
       <span class="header-spacer"></span>
       <button id="btn-add" class="btn-small" title="Thêm task">+</button>
       <button id="btn-hide" class="btn-small" title="Thu nhỏ (Esc)">×</button>
@@ -30,15 +30,15 @@
         </div>
         <div id="view-form" class="view hidden">
           <div class="form-title" id="form-title">Thêm task</div>
-          <label class="field">tên dự án
+          <label class="field">Tên dự án
             <input id="f-name" type="text" autocomplete="off" spellcheck="false">
           </label>
-          <label class="field">hạn giao khách (vd: 15/3)
+          <label class="field">Hạn giao khách (vd: 15/3)
             <span class="date-pair" id="f-deadline">
               <input class="d-text" type="text" placeholder="15/3" autocomplete="off" spellcheck="false">
             </span>
           </label>
-          <div class="field-label">các bước làm (tên bước — người phụ trách)</div>
+          <div class="field-label">Các bước làm (tên bước — người phụ trách)</div>
           <div id="f-stages"></div>
           <button id="btn-add-stage" class="btn-line" type="button">+ bước</button>
           <div id="f-error" class="form-error hidden"></div>
@@ -51,8 +51,10 @@
       <div id="col-detail" class="hidden"></div>
     </div>
     <div class="panel-footer">
-      <span class="footer-label" title="Độ đậm nền bảng">nền</span>
+      <span class="footer-label" title="Độ đậm nền bảng">Nền</span>
       <input id="scrim-slider" type="range" min="0" max="90" step="5" value="35">
+      <button id="btn-font-minus" class="btn-small" type="button" title="Giảm cỡ chữ">−</button>
+      <button id="btn-font-plus" class="btn-small" type="button" title="Tăng cỡ chữ">+</button>
     </div>
   </div>
 

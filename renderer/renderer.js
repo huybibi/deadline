@@ -83,12 +83,12 @@ function rowHtml(t) {
     '<div class="row-top">' +
       '<span class="task-name">' + esc(t.name) + '</span>' +
       '<span class="row-actions">' +
-        '<button class="btn-mini" data-act="edit">sửa</button>' +
-        '<button class="btn-mini" data-act="delete">xoá</button>' +
+        '<button class="btn-mini" data-act="edit">Sửa</button>' +
+        '<button class="btn-mini" data-act="delete">Xoá</button>' +
       '</span>' +
     '</div>' +
     '<div class="row-bottom">' +
-      '<span class="deadline-date">hạn ' + esc(util.fmtDateVN(t.clientDeadline)) + '</span>' +
+      '<span class="deadline-date">Hạn ' + esc(util.fmtDateVN(t.clientDeadline)) + '</span>' +
       '<span class="countdown ' + (urgent ? 'strong' : '') + '">' + esc(util.formatCountdown(d)) + '</span>' +
       (t.risk ? '<span class="risk-label">CÓ RỦI RO</span>' : '') +
       (ready && !t.risk ? '<span class="ready-label">SẴN SÀNG GIAO</span>' : '') +
@@ -101,11 +101,11 @@ function deliveredRowHtml(t) {
     '<div class="row-top">' +
       '<span class="task-name">' + esc(t.name) + '</span>' +
       '<span class="row-actions">' +
-        '<button class="btn-mini" data-act="revise">khách muốn sửa</button>' +
+        '<button class="btn-mini" data-act="revise">Khách muốn sửa</button>' +
       '</span>' +
     '</div>' +
     '<div class="row-bottom">' +
-      '<span class="countdown">đã giao ' + esc(util.fmtDateStamp(t.deliveredAt)) + '</span>' +
+      '<span class="countdown">Đã giao ' + esc(util.fmtDateStamp(t.deliveredAt)) + '</span>' +
     '</div>' +
   '</div>';
 }
@@ -179,7 +179,7 @@ function renderDetail() {
       '<button id="btn-back" class="btn-small">←</button>' +
       '<div class="detail-heading">' +
         '<div class="detail-name">' + esc(t.name) + '</div>' +
-        '<div class="detail-meta">hạn ' + esc(util.fmtDateVN(t.clientDeadline)) + ' · ' +
+        '<div class="detail-meta">Hạn ' + esc(util.fmtDateVN(t.clientDeadline)) + ' · ' +
           esc(util.formatCountdown(d)) +
           (t.risk ? ' · <span class="risk-label">CÓ RỦI RO</span>' : '') + '</div>' +
       '</div>' +
@@ -198,7 +198,7 @@ function renderDetail() {
       '<div class="field-label">vòng chỉnh sửa lần ' + (maxRevision(t) + 1) + ':</div>' +
       '<div id="r-stages"></div>' +
       '<button id="btn-add-rev-stage" class="btn-line" type="button">+ bước</button>' +
-      '<label class="field">hạn nộp lại (ngày/tháng)' +
+      '<label class="field">Hạn nộp lại (ngày/tháng)' +
         '<span class="date-pair" id="r-deadline"><input class="d-text" type="text" placeholder="15/3" autocomplete="off" spellcheck="false"></span>' +
       '</label>' +
       '<div class="form-actions">' +
@@ -562,13 +562,58 @@ $('#scrim-slider').addEventListener('input', (e) => applyScrim(e.target.value));
 $('#scrim-slider').addEventListener('change', (e) => api.setScrim(+e.target.value));
 api.getScrim().then(applyScrim);
 
+// ---------- cỡ chữ ----------
+// Tăng/giảm cỡ chữ: main.js phóng/thu cửa sổ theo đúng tỉ lệ, ở đây zoom giao
+// diện bằng chính tỉ lệ đó → các ô bao quanh chữ to ra theo, chữ không xuống dòng.
+const FONT_MIN = 0.8;
+const FONT_MAX = 1.6;
+const FONT_STEP = 0.1;
+let fontScale = 1;
+
+function applyFontScale(s) {
+  fontScale = Math.min(Math.max(Number(s) || 1, FONT_MIN), FONT_MAX);
+  document.documentElement.style.zoom = String(fontScale);
+  const pct = Math.round(fontScale * 100);
+  $('#btn-font-minus').title = 'Giảm cỡ chữ (' + pct + '%)';
+  $('#btn-font-plus').title = 'Tăng cỡ chữ (' + pct + '%)';
+  $('#btn-font-minus').disabled = fontScale <= FONT_MIN + 1e-6;
+  $('#btn-font-plus').disabled = fontScale >= FONT_MAX - 1e-6;
+}
+
+function changeFont(delta) {
+  const next = Math.round((fontScale + delta) / FONT_STEP) * FONT_STEP;
+  api.setFontScale(Number(next.toFixed(2))).then(applyFontScale);
+}
+
+$('#btn-font-minus').addEventListener('click', () => changeFont(-FONT_STEP));
+$('#btn-font-plus').addEventListener('click', () => changeFont(FONT_STEP));
+api.getFontScale().then(applyFontScale);
+
 // ---------- menu chuột phải ----------
+// Chế độ nút lơ lửng: cửa sổ chỉ 152×46, menu 190px không lọt → chỉ hiện nút
+// "Thoát" cho phủ kín cửa sổ (xem body.mode-button #ctx-menu trong style.css).
+// Trước đây toạ độ bị kẹp bằng innerWidth-200 / innerHeight-80 nên ra số âm,
+// menu lòi ra ngoài cửa sổ và bị overflow:hidden cắt thành một mẩu vụn.
+function showCtxMenu(x, y) {
+  const menu = $('#ctx-menu');
+  const compact = state.mode === 'button';
+  $('#ctx-hide').classList.toggle('hidden', compact);
+  menu.classList.remove('hidden');
+  if (compact) {
+    menu.style.left = '';
+    menu.style.top = '';
+    return;
+  }
+  // các chế độ khác: đo menu rồi kẹp vị trí vào trong cửa sổ
+  menu.style.left = '0px';
+  menu.style.top = '0px';
+  const r = menu.getBoundingClientRect();
+  menu.style.left = Math.max(1, Math.min(x, window.innerWidth - r.width - 1)) + 'px';
+  menu.style.top = Math.max(1, Math.min(y, window.innerHeight - r.height - 1)) + 'px';
+}
 document.addEventListener('contextmenu', (e) => {
   e.preventDefault();
-  const menu = $('#ctx-menu');
-  menu.classList.remove('hidden');
-  menu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
-  menu.style.top = Math.min(e.clientY, window.innerHeight - 80) + 'px';
+  showCtxMenu(e.clientX, e.clientY);
 });
 document.addEventListener('mousedown', (e) => {
   if (!e.target.closest('#ctx-menu')) $('#ctx-menu').classList.add('hidden');

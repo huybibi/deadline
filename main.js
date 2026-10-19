@@ -24,6 +24,16 @@ function minWidthFor(m) {
   return m === 'detail' ? DETAIL_MIN_WIDTH : MIN_EXPANDED.width;
 }
 
+// Cỡ chữ: 0.8–1.6, bước 0.1. Mọi kích thước bố cục ở trên là đơn vị LOGIC; cửa sổ
+// thật = đơn vị logic × fontScale (dev()), giao diện zoom đúng bằng fontScale —
+// nhờ vậy đổi cỡ chữ chỉ phóng to/thu nhỏ cả khối, không làm chữ xuống dòng.
+const FONT_MIN = 0.8;
+const FONT_MAX = 1.6;
+let fontScale = 1;
+
+const dev = (v) => Math.round(v * fontScale);
+const undev = (v) => v / fontScale;
+
 let win = null;
 let tray = null;
 let mode = 'button';
@@ -83,10 +93,10 @@ function persistLayout() {
   if (mode === 'button') {
     layout.button = { x: b.x, y: b.y };
   } else {
-    // chiều cao ghi đè lên giá trị chung; chiều rộng chỉ ghi của trạng thái hiện tại
-    layout.height = b.height;
-    if (mode === 'panel') layout.panelWidth = b.width;
-    else layout.detailWidth = b.width;
+    // lưu theo đơn vị logic (chia fontScale) để đổi cỡ chữ không làm trôi bố cục
+    layout.height = Math.round(undev(b.height));
+    if (mode === 'panel') layout.panelWidth = Math.round(undev(b.width));
+    else layout.detailWidth = Math.round(undev(b.width));
   }
   try {
     const out = { button: layout.button };
@@ -143,8 +153,8 @@ function setMode(next) {
       // đóng chi tiết: trả chiều rộng bảng cũ, chiều cao giữ nguyên (đồng bộ),
       // cột danh sách giữ chỗ theo hướng nở của chi tiết
       w = panelBounds ? panelBounds.width : (layout.panelWidth || SIZES.panel.width);
-      h = cur.height;
-      if (detailSide === 'left') x = cur.x + cur.width - w;
+      h = undev(cur.height);
+      if (detailSide === 'left') x = cur.x + cur.width - dev(w);
       panelBounds = null;
     } else {
       // mở bảng từ nút: hiện tại chỗ nút, kích thước riêng của bảng
@@ -154,20 +164,20 @@ function setMode(next) {
   } else {
     // mở chi tiết: chiều rộng riêng, chiều cao giữ nguyên (đồng bộ với bảng)
     w = Math.max(layout.detailWidth || SIZES.detail.width, DETAIL_MIN_WIDTH);
-    h = cur.height;
-    panelBounds = { x: cur.x, y: cur.y, width: cur.width, height: cur.height };
-    detailSide = cur.x + w <= wa.x + wa.width ? 'right' : 'left';
-    if (detailSide === 'left') x = cur.x + cur.width - w;
+    h = undev(cur.height);
+    panelBounds = { x: cur.x, y: cur.y, width: undev(cur.width), height: h };
+    detailSide = cur.x + dev(w) <= wa.x + wa.width ? 'right' : 'left';
+    if (detailSide === 'left') x = cur.x + cur.width - dev(w);
   }
-  const p = clampTo(x, y, w, h, wa);
+  const p = clampTo(x, y, dev(w), dev(h), wa);
   mode = next;
-  win.setBounds({ x: p.x, y: p.y, width: w, height: h });
+  win.setBounds({ x: p.x, y: p.y, width: dev(w), height: dev(h) });
   win.webContents.send('mode', mode, detailSide);
 }
 
 function createWindow() {
   loadLayout();
-  const s = SIZES.button;
+  const s = { width: dev(SIZES.button.width), height: dev(SIZES.button.height) };
   let p;
   if (layout.button) {
     p = clamp(layout.button.x, layout.button.y, s.width, s.height);
@@ -204,10 +214,10 @@ function createWindow() {
   win.on('resize', () => {
     if (mode !== 'button' || fixBusy) return;
     const b = win.getBounds();
-    if (b.width !== SIZES.button.width || b.height !== SIZES.button.height) {
+    if (b.width !== s.width || b.height !== s.height) {
       fixBusy = true;
-      const p2 = clamp(b.x, b.y, SIZES.button.width, SIZES.button.height);
-      win.setBounds({ x: p2.x, y: p2.y, width: SIZES.button.width, height: SIZES.button.height });
+      const p2 = clamp(b.x, b.y, s.width, s.height);
+      win.setBounds({ x: p2.x, y: p2.y, width: s.width, height: s.height });
       fixBusy = false;
     }
   });
@@ -226,6 +236,9 @@ app.on('second-instance', () => {
 app.whenReady().then(() => {
   store.init(path.join(app.getPath('userData'), 'tasks.json'));
   if (process.env.DEADLINE_SEED === '1') seed(store);
+  // cỡ chữ đã lưu phải có trước khi tạo cửa sổ (mọi kích thước đi qua dev())
+  const savedFont = Number(readSettings().fontScale);
+  fontScale = Number.isFinite(savedFont) ? Math.min(Math.max(savedFont, FONT_MIN), FONT_MAX) : 1;
   createWindow();
   createTray();
   globalShortcut.register('Ctrl+Alt+D', toggleWidget);
@@ -291,11 +304,12 @@ ipcMain.on('widget:set-position', (_e, x, y, w, h) => {
   // nút: ép đúng kích thước gốc (chống trôi DPI);
   // bảng: dùng kích thước chụp lúc bắt đầu kéo (chống phình DPI), thiếu thì giữ hiện tại
   let s;
-  if (mode === 'button') s = SIZES.button;
+  if (mode === 'button') s = { width: dev(SIZES.button.width), height: dev(SIZES.button.height) };
   else if (Number.isFinite(w) && Number.isFinite(h)) {
+    // renderer gửi px thiết bị → đổi về đơn vị logic rồi mới chặn ngưỡng
     s = {
-      width: Math.max(Math.round(w), minWidthFor(mode)),
-      height: Math.max(Math.round(h), MIN_EXPANDED.height),
+      width: dev(Math.max(undev(w), minWidthFor(mode))),
+      height: dev(Math.max(undev(h), MIN_EXPANDED.height)),
     };
   } else s = { width: cur.width, height: cur.height };
   const p = clamp(Math.round(x), Math.round(y), s.width, s.height);
@@ -315,8 +329,8 @@ ipcMain.on('widget:set-bounds', (_e, b) => {
   // thiếu/garbage x,y (gọi tay, DPI glitch) → giữ vị trí hiện tại, không để NaN
   const nx = Number.isFinite(b.x) ? Math.round(b.x) : cur.x;
   const ny = Number.isFinite(b.y) ? Math.round(b.y) : cur.y;
-  const w = Math.min(Math.max(Math.round(b.width), minWidthFor(mode)), wa.width);
-  const h = Math.min(Math.max(Math.round(b.height), MIN_EXPANDED.height), wa.height);
+  const w = Math.min(dev(Math.max(undev(Math.round(b.width)), minWidthFor(mode))), wa.width);
+  const h = Math.min(dev(Math.max(undev(Math.round(b.height)), MIN_EXPANDED.height)), wa.height);
   const p = clamp(nx, ny, w, h);
   win.setBounds({ x: p.x, y: p.y, width: w, height: h });
   scheduleLayoutSave();
@@ -335,21 +349,54 @@ ipcMain.handle('data:markDelivered', (_e, id) => store.markDelivered(id));
 ipcMain.handle('data:markDone', (_e, id) => store.markDone(id));
 ipcMain.handle('data:toggleRisk', (_e, id) => store.toggleRisk(id));
 
-// ---------- cài đặt giao diện (độ đậm nền) ----------
+// ---------- cài đặt giao diện (độ đậm nền, cỡ chữ) ----------
 function settingsFile() {
   return path.join(app.getPath('userData'), 'settings.json');
 }
 
+function readSettings() {
+  try { return JSON.parse(fs.readFileSync(settingsFile(), 'utf8')) || {}; }
+  catch (_) { return {}; }
+}
+
+// ghi kiểu trộn: đổi cỡ chữ không xoá độ đậm nền đã lưu và ngược lại
+function writeSettings(patch) {
+  try { fs.writeFileSync(settingsFile(), JSON.stringify({ ...readSettings(), ...patch })); }
+  catch (_) { /* không ghi được thì tạm dùng giá trị trong phiên */ }
+}
+
 ipcMain.handle('ui:get-scrim', () => {
-  try {
-    const s = JSON.parse(fs.readFileSync(settingsFile(), 'utf8'));
-    if (Number.isFinite(s.scrim)) return s.scrim;
-  } catch (_) { /* chưa có file */ }
-  return 35;
+  const s = readSettings();
+  return Number.isFinite(s.scrim) ? s.scrim : 35;
 });
 
 ipcMain.on('ui:set-scrim', (_e, v) => {
-  try {
-    fs.writeFileSync(settingsFile(), JSON.stringify({ scrim: Math.min(Math.max(Math.round(Number(v) || 0), 0), 90) }));
-  } catch (_) { /* không ghi được thì tạm dùng giá trị trong phiên */ }
+  writeSettings({ scrim: Math.min(Math.max(Math.round(Number(v) || 0), 0), 90) });
 });
+
+// ---------- cỡ chữ ----------
+// Cửa sổ phóng/thu theo đúng tỉ lệ, neo góc trên-trái (chi tiết nở trái thì neo
+// mép phải để cột danh sách đứng yên) — bố cục bên trong giữ nguyên từng px logic.
+function setFontScale(next) {
+  const want = Math.min(Math.max(Math.round((Number(next) || 1) * 10) / 10, FONT_MIN), FONT_MAX);
+  if (!win) {
+    fontScale = want;
+    writeSettings({ fontScale: want });
+    return fontScale;
+  }
+  const b = win.getBounds();
+  const lw = b.width / fontScale; // đơn vị logic theo cỡ chữ CŨ
+  const lh = b.height / fontScale;
+  fontScale = want;
+  writeSettings({ fontScale: want });
+  const nw = dev(lw);
+  const nh = dev(lh);
+  const x = mode === 'detail' && detailSide === 'left' ? b.x + b.width - nw : b.x;
+  const p = clampTo(x, b.y, nw, nh, workAreaFor(b));
+  win.setBounds({ x: p.x, y: p.y, width: nw, height: nh });
+  scheduleLayoutSave();
+  return fontScale;
+}
+
+ipcMain.handle('ui:get-font-scale', () => fontScale);
+ipcMain.handle('ui:set-font-scale', (_e, v) => setFontScale(v));

@@ -1,10 +1,18 @@
-# deadline — widget quản lý deadline
+# Deadline — widget quản lý deadline
 
 Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khách** với thẩm pháp mono (trắng/đen/xám, nền trong suốt).
 
-| Nút nổi | Bảng xếp hạng | Thêm task | Chi tiết task |
-|---------|---------------|-----------|--------------|
-| ![Nút nổi](docs/screenshots/nut.png) | ![Bảng xếp hạng](docs/screenshots/bang.png) | ![Thêm task](docs/screenshots/them-task.png) | ![Chi tiết task](docs/screenshots/chi-tiet.png) |
+<p align="center">
+  <img src="docs/screenshots/anh-1.png" width="45%" alt="Ảnh chụp 1">
+  <img src="docs/screenshots/anh-2.png" width="45%" alt="Ảnh chụp 2">
+</p>
+<p align="center">
+  <img src="docs/screenshots/anh-3.png" width="45%" alt="Ảnh chụp 3">
+  <img src="docs/screenshots/anh-4.png" width="45%" alt="Ảnh chụp 4">
+</p>
+<p align="center">
+  <img src="docs/screenshots/anh-5.png" width="45%" alt="Ảnh chụp 5">
+</p>
 
 ## Tính năng
 
@@ -14,6 +22,7 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 - **Hạn giao khách**: nhập tự do kiểu `15/3` (năm tự suy) hoặc `15/3/2027` — chấp nhận dấu `/`, `-`, `.`, khoảng trắng.
 - **Vòng chỉnh sửa**: khách yêu cầu sửa → thêm vòng mới (Chỉnh sửa lần N) + hạn nộp lại.
 - **Thẩm pháp mono**: trắng/đen/xám, viền 1px, nền trong suốt + scrim nhẹ; khẩn cấp = chữ đậm + nhãn, không dùng màu.
+- **Cỡ chữ**: nút **−** / **+** ở đáy bảng tăng giảm cỡ chữ (80%–160%); các ô bao quanh chữ tự phóng to theo, không bị xuống dòng.
 - **Shortcut desktop**: chạy `make-shortcut.bat` một lần để tạo shortcut trên desktop.
 
 ## Chạy (từ mã nguồn)
@@ -30,7 +39,7 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 - Bấm vào task → từng bước có nút **Bắt đầu / Xong**, nhấn nhầm thì **Hoàn tác**. Cần việc phát sinh sau khi tạo task → **Thêm bước** ngay trong trang chi tiết.
 - **Báo trễ** → task nhảy lên đầu với nhãn CÓ RỦI RO → gọi khách xin lùi → bấm **Sửa hạn** → mọi thứ tự sắp lại.
 - Khách yêu cầu chỉnh sửa → **Khách yêu cầu chỉnh sửa**: thêm vòng sửa mới (Chỉnh sửa lần N, nhiều người nếu cần) + hạn nộp lại.
-- Xong hết bước → nút **Đã giao khách** mở khoá → task xuống mục "Đã giao — chờ phản hồi". Khách muốn sửa → bấm "khách muốn sửa".
+- Xong hết bước → nút **Đã giao khách** mở khoá → task xuống mục "Đã giao — chờ phản hồi". Khách muốn sửa → bấm "Khách muốn sửa".
 - **Hoàn tất** → ẩn task vĩnh viễn. **Xoá** trên dòng → xoá hẳn (phải bấm xác nhận).
 
 ## Phím & điều khiển

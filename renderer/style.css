@@ -399,14 +399,28 @@ input:disabled { opacity: 0.5; }
   font-size: 11px;
 }
 
-.footer-label { opacity: 0.75; }
+.footer-label { opacity: 0.75; white-space: nowrap; }
 
 #scrim-slider {
   flex: 1;
+  min-width: 60px;
   height: 14px;
   accent-color: #fff;
   background: transparent;
 }
+
+/* 2 nút cỡ chữ lấy một phần diện tích của thanh trượt độ đậm nền */
+#btn-font-minus,
+#btn-font-plus {
+  flex: none;
+  width: 22px;
+  height: 20px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+#btn-font-minus:disabled,
+#btn-font-plus:disabled { opacity: 0.35; cursor: default; }
 
 /* ---------- điểm nắm đổi kích thước (chỉ hiện khi mở bảng) ---------- */
 .rs { position: fixed; z-index: 90; display: none; }
@@ -430,6 +444,24 @@ body.mode-panel .rs, body.mode-detail .rs { display: block; }
   padding: 4px 0;
   z-index: 100;
   min-width: 190px;
+}
+
+/* chế độ nút lơ lửng: cửa sổ chỉ 152×46 nên menu phải nằm trọn trong cửa sổ,
+   chỉ còn 1 nút "Thoát" — trước đây menu 190px bị đẩy ra ngoài và bị cắt cụt */
+body.mode-button #ctx-menu {
+  inset: 1px;
+  min-width: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.92);
+}
+
+body.mode-button #ctx-menu .ctx-item {
+  width: 100%;
+  padding: 0;
+  text-align: center;
 }
 
 .ctx-item {

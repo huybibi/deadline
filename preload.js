@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('api', {
   setBounds: (b) => ipcRenderer.send('widget:set-bounds', b),
   getScrim: () => ipcRenderer.invoke('ui:get-scrim'),
   setScrim: (v) => ipcRenderer.send('ui:set-scrim', v),
+  getFontScale: () => ipcRenderer.invoke('ui:get-font-scale'),
+  setFontScale: (v) => ipcRenderer.invoke('ui:set-font-scale', v),
   onMode: (cb) => ipcRenderer.on('mode', (_e, m, side) => cb(m, side)),
   tasks: {
     get: () => ipcRenderer.invoke('data:get'),
