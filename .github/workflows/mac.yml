@@ -28,7 +28,9 @@ jobs:
         run: npm test
 
       - name: Dựng DMG + ZIP (arm64 + x64, ký ad-hoc)
-        run: npx electron-builder --mac dmg zip -p never
+        # phải ghi rõ --arm64 --x64: chỉ truyền target trên CLI sẽ chỉ dựng đúng
+        # kiến trúc của runner (macos-latest = arm64), bỏ sót bản cho máy Intel
+        run: npx electron-builder --mac --arm64 --x64 -p never
 
       - name: Danh sách file sau khi dựng
         run: ls -lh dist
