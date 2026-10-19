@@ -254,11 +254,11 @@ function createTray() {
       label: 'Khởi động cùng Windows',
       type: 'checkbox',
       checked: app.getLoginItemSettings().openAtLogin,
-      // bản chưa đóng gói: đăng ký electron.exe + thư mục app; bản .exe sau này tự đúng
+      // bản .exe: tự đăng ký chính nó; bản chưa đóng gói: đăng ký electron.exe + thư mục app
       click: (item) => app.setLoginItemSettings({
         openAtLogin: item.checked,
         path: process.execPath,
-        args: [app.getAppPath()],
+        ...(app.isPackaged ? {} : { args: [app.getAppPath()] }),
       }),
     },
     { type: 'separator' },
