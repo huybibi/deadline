@@ -1,0 +1,55 @@
+name: build-mac
+
+# Bản cài macOS (.dmg + .zip cho cả Apple Silicon và Intel) phải dựng trên máy macOS:
+# Windows/Linux không tạo được .dmg và không ký được app. Workflow này chạy trên runner
+# macOS của GitHub (miễn phí với repo công khai) rồi đưa file lên release v0.1.0.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cài phụ thuộc
+        run: npm ci || npm install
+
+      - name: Test đơn vị
+        run: npm test
+
+      - name: Dựng DMG + ZIP (arm64 + x64, ký ad-hoc)
+        run: npx electron-builder --mac dmg zip -p never
+
+      - name: Danh sách file sau khi dựng
+        run: ls -lh dist
+
+      - name: Kiểm tra khói trên bản đã đóng gói
+        # không chặn workflow: runner có thể không có phiên đồ hoạ để mở app
+        continue-on-error: true
+        run: |
+          set -x
+          APP=$(ls -d dist/mac-*/deadline.app 2>/dev/null | head -1)
+          echo "app: $APP"
+          DEADLINE_EXE="$APP/Contents/MacOS/deadline" node scripts/check-smoke.js
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deadline-mac
+          path: |
+            dist/*.dmg
+            dist/*.zip
+
+      - name: Đưa lên release v0.1.0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload v0.1.0 dist/*.dmg dist/*.zip --clobber

@@ -264,9 +264,16 @@ function toggleWidget() {
   }
 }
 
+// macOS không đọc được .ico → khay menu bar dùng .png, Windows vẫn dùng .ico
+function trayIconPath() {
+  return process.platform === 'darwin'
+    ? path.join(__dirname, 'assets', 'icon.png')
+    : iconPath();
+}
+
 function createTray() {
   try {
-    tray = new Tray(iconPath());
+    tray = new Tray(trayIconPath());
   } catch (_) {
     return; // thiếu file icon thì chạy tiếp không tray (Ctrl+Alt+D vẫn hoạt động)
   }
@@ -275,7 +282,7 @@ function createTray() {
     { label: 'Hiện / Ẩn widget (Ctrl+Alt+D)', click: toggleWidget },
     { type: 'separator' },
     {
-      label: 'Khởi động cùng Windows',
+      label: process.platform === 'darwin' ? 'Khởi động cùng máy' : 'Khởi động cùng Windows',
       type: 'checkbox',
       checked: app.getLoginItemSettings().openAtLogin,
       // bản .exe: tự đăng ký chính nó; bản chưa đóng gói: đăng ký electron.exe + thư mục app
