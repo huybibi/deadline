@@ -2,7 +2,8 @@
 _Cập nhật: 20/10/2026 (v0.2.0 — bố cục co dãn theo cỡ chữ + ngưỡng rộng tối thiểu)_
 
 ## v0.2.0 (20/10/2026) — bố cục trạng thái 2 & 3
-- **ĐÃ GỠ bản phát hành v0.2.0 khỏi GitHub (20/10/2026)**: người dùng báo có bug mới → xoá release + tag v0.2.0, README trả link tải về v0.1.0, xoá `.github/workflows/win.yml`, `mac.yml` trả tag v0.1.0. Code bố cục mới **vẫn giữ trên nhánh main** để sửa bug rồi phát hành lại; `package.json` vẫn 0.2.0. Release mới nhất trên GitHub hiện là **v0.1.0**.
+- **PHÁT HÀNH LẠI v0.2.0 (20/10/2026)**: sau khi sửa ngưỡng 320/674, người dùng xác nhận ổn → tạo lại tag `v0.2.0`, release `v0.2.0` (exe portable do máy Windows dựng + dmg/zip mac do `mac.yml` dựng trên runner macOS), README trỏ lại link v0.2.0, `mac.yml` đặt `TAG: v0.2.0`.
+- Trước đó **đã gỡ** bản v0.2.0 đầu tiên (bug kéo mép bị kẹt 380/420px): xoá release + tag, README trả về v0.1.0, xoá `win.yml`.
 - Trạng thái 2 (bảng danh sách): cửa sổ rộng tối thiểu **320px** (`MIN_EXPANDED.width`). Cột `#col-list` dùng `flex: 1 1 320px; min-width: 0` (co theo cửa sổ: ở 320px cột còn 297px, tên task cắt "…").
   - **Sửa bug kéo mép bị kẹt 380/420px**: renderer từng tự chặn `Math.max(380, w)` / `Math.max(420, h)` → giờ hỏi main qua IPC mới `ui:get-min-size` (trả `minWidthFor(mode)`), nên bảng danh sách kéo xuống đúng 320px, chi tiết đúng 674px.
 - Trạng thái 3 (chi tiết): cửa sổ tối thiểu **674px** = danh sách **320** + khe 12 + chi tiết **320** + viền/padding 22 (`DETAIL_MIN_WIDTH`), cũng là chiều rộng **mặc định** khi mở chi tiết (`SIZES.detail.width`). Hai cột đều `flex: 1 1 320px; min-width: 320px`.
@@ -10,8 +11,8 @@ _Cập nhật: 20/10/2026 (v0.2.0 — bố cục co dãn theo cỡ chữ + ngư�
 - `.stage-bottom` thêm `flex-wrap: wrap` để nút không tràn khi cột hẹp.
 - Kích thước mặc định cửa sổ chi tiết 920 → **674** (đúng bằng ngưỡng 2 cột 320/320).
 - Vẫn giữ cơ chế cũ: đổi cỡ chữ = zoom giao diện × fontScale và cửa sổ phóng đúng tỉ lệ, nên mọi ngưỡng (px logic) tự nhân theo — không bẻ chữ, không tràn.
-- Script kiểm mới: `scripts/check-layout-shot.js` (đo bố cục 4 tổ hợp trạng thái × 100/160%, xuất ảnh `dist/_layout/`). `scripts/check-anchor.js` cập nhật ngưỡng 994/640 và chiều rộng chi tiết 1100.
-- Kiểm thử: `npm test` 4/4, `scripts/e2e.js` 11/11, `scripts/check-font.js` PASS (80–150%), `scripts/check-anchor.js` PASS, `scripts/check-smoke.js` trên bản đóng gói PASS.
+- Script kiểm mới: `scripts/check-layout-shot.js` (đo bố cục 4 tổ hợp trạng thái × 100/160%, xuất ảnh `dist/_layout/`). `scripts/check-anchor.js` thêm case ngưỡng 320px cho bảng danh sách và 674px cho chi tiết.
+- Kiểm thử: `npm test` 7/7, `scripts/e2e.js` PASS, `scripts/check-font.js` PASS (80–160%), `scripts/check-anchor.js` PASS, `scripts/check-smoke.js` trên bản đóng gói PASS.
 - Đóng gói: `dist/deadline-0.2.0-portable.exe` (~100MB). Bản mac do workflow `.github/workflows/mac.yml` dựng trên runner macOS; thêm `.github/workflows/win.yml` để CI cũng dựng + đẩy exe lên release `v0.2.0`.
 
 ## Tóm tắt
