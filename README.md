@@ -89,4 +89,4 @@ Chỉ cần làm một lần cho mỗi lần tải về. App chạy trên cả I
 
 ## Giấy phép
 
-Dự án cho tất cả account manager tiếng Việt.
+Free for all
