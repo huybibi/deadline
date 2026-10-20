@@ -11,13 +11,18 @@ const SIZES = {
   // không bị Windows xén mất ở màn hình scale phân số (125%/150%)
   button: { width: 152, height: 46 },
   panel: { width: 540, height: 660 },
-  detail: { width: 920, height: 660 },
+  // >= DETAIL_MIN_WIDTH (994) để mở chi tiết là thấy đủ 2 cột ngay từ đầu
+  detail: { width: 1000, height: 660 },
 };
-const MIN_EXPANDED = { width: 380, height: 420 };
-// Chi tiết gồm 2 cột: danh sách 340px + khe 12px + cột chi tiết tối thiểu 360px
+// Cột danh sách tối thiểu 320px (xem #col-list trong style.css); cửa sổ phải rộng
+// thêm phần viền 2px + padding 20px của #panel thì cột mới đủ 320px mà không tràn.
+const PANEL_MIN_COL = 320;
+const PANEL_CHROME = 22;
+const MIN_EXPANDED = { width: PANEL_MIN_COL + PANEL_CHROME, height: 420 };
+// Chi tiết gồm 2 cột: danh sách 320px + khe 12px + cột chi tiết tối thiểu 640px
 // (xem #col-detail trong style.css) + viền/padding panel 22px. Chặn cửa sổ không
 // cho hẹp hơn ngưỡng này, nếu không cột chi tiết bị ép về 0 (chỉ còn viền 1px).
-const DETAIL_MIN_WIDTH = 340 + 12 + 360 + 22;
+const DETAIL_MIN_WIDTH = PANEL_MIN_COL + 12 + 640 + PANEL_CHROME;
 
 // chiều rộng nhỏ nhất của cửa sổ theo chế độ (chi tiết phải đủ chỗ cho 2 cột)
 function minWidthFor(m) {

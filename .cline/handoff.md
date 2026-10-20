@@ -1,5 +1,17 @@
 # Bàn giao — Widget "deadline" (quản lý deadline cho account manager)
-_Cập nhật: 19/10/2026 (bản vá phản hồi thứ 5 + đóng gói)_
+_Cập nhật: 20/10/2026 (v0.2.0 — bố cục co dãn theo cỡ chữ + ngưỡng rộng tối thiểu)_
+
+## v0.2.0 (20/10/2026) — bố cục trạng thái 2 & 3
+- Trạng thái 2 (bảng danh sách): cửa sổ rộng tối thiểu 342px → cột danh sách đúng **320px** (320 + viền 2px + padding 20px). Cột `#col-list` dùng `flex: 1 1 320px; min-width: 320px` nên co dãn được, không còn cứng như trước.
+- Trạng thái 3 (chi tiết): cửa sổ tối thiểu **994px** = danh sách 320 + khe 12 + cột chi tiết 640 + viền/padding 22 (`DETAIL_MIN_WIDTH` trong main.js). Cột chi tiết `flex: 2 1 640px; min-width: 640px`; danh sách `flex: 1 1 320px`.
+  - Bỏ `width: 340px` cứng của `#col-list` (nay co dãn), bỏ nguy cơ `flex: none` phình theo tên task dài.
+- Tên dài: `.detail-name` và `.stage-label` xuống dòng tối đa **2 dòng** rồi cắt `…` (`-webkit-line-clamp: 2`); `.stage-label` có `flex: 1 1 auto; min-width: 0` để co lại thay vì tràn; `.stage-owner` `flex: none; max-width: 45%` + ellipsis.
+- `.stage-bottom` thêm `flex-wrap: wrap` để nút không tràn khi cột hẹp.
+- Kích thước mặc định cửa sổ chi tiết 920 → **1000** (≥ ngưỡng 994 để mở là thấy đủ 2 cột).
+- Vẫn giữ cơ chế cũ: đổi cỡ chữ = zoom giao diện × fontScale và cửa sổ phóng đúng tỉ lệ, nên mọi ngưỡng (px logic) tự nhân theo — không bẻ chữ, không tràn.
+- Script kiểm mới: `scripts/check-layout-shot.js` (đo bố cục 4 tổ hợp trạng thái × 100/160%, xuất ảnh `dist/_layout/`). `scripts/check-anchor.js` cập nhật ngưỡng 994/640 và chiều rộng chi tiết 1100.
+- Kiểm thử: `npm test` 4/4, `scripts/e2e.js` 11/11, `scripts/check-font.js` PASS (80–150%), `scripts/check-anchor.js` PASS, `scripts/check-smoke.js` trên bản đóng gói PASS.
+- Đóng gói: `dist/deadline-0.2.0-portable.exe` (~100MB). Bản mac do workflow `.github/workflows/mac.yml` dựng trên runner macOS; thêm `.github/workflows/win.yml` để CI cũng dựng + đẩy exe lên release `v0.2.0`.
 
 ## Tóm tắt
 App v1 + 4 vòng vá theo phản hồi người dùng. Kiểm thử: 4/4 unit + 15/15 E2E + 8/8 check ghim góc (`scripts/check-anchor.js`) pass. Vòng 1: kéo/resize bảng, thêm bước phát sinh. Vòng 2: chống trôi kích thước khi kéo, bỏ dòng nhắc, ô hạn ngày/tháng (năm tự suy), tray icon + Thoát + khởi động cùng Windows, shortcut desktop, bộ icon, thanh độ đậm nền. Vòng 3: viền nút/bảng đủ 4 cạnh (chống xén DPI: cửa sổ nút 152×46, `#widget`/`#panel` vẽ `position:absolute; inset:1px`, html/body 100%×100%). Vòng 4: đổi ghim góc từ trên-phải sang **trên-trái** — sửa 2 bug nhảy vị trí: (1) tắt bảng sau khi kéo → nút trôi theo mép phải bảng, mở lại bảng hiện "vị trí cuối cùng" thay vì tại nút; (2) mở/thu chi tiết → cửa sổ nở/trả sang trái 380px làm cột danh sách nhảy; (3) đồng bộ **chiều cao** chung 2 trạng thái (thu gọn/mở chi tiết), chiều rộng riêng từng trạng thái; chi tiết nở **phải** khi đủ chỗ (danh sách giữ mép trái) hoặc nở **trái** khi bảng gần mép phải màn hình (cột chi tiết bên trái danh sách, danh sách giữ mép phải — class `detail-left` lật cột qua CSS `flex-direction: row-reverse`).

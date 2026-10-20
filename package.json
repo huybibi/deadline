@@ -1,7 +1,7 @@
 {
   "name": "deadline-widget",
   "productName": "deadline",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Widget quản lý deadline — bảng xếp hạng task theo hạn giao khách",
   "main": "main.js",

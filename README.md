@@ -23,6 +23,7 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 - **Vòng chỉnh sửa**: khách yêu cầu sửa → thêm vòng mới (Chỉnh sửa lần N) + hạn nộp lại.
 - **Thẩm pháp mono**: trắng/đen/xám, viền 1px, nền trong suốt + scrim nhẹ; khẩn cấp = chữ đậm + nhãn, không dùng màu.
 - **Cỡ chữ**: nút **−** / **+** ở đáy bảng tăng giảm cỡ chữ (80%–160%); các ô bao quanh chữ tự phóng to theo, không bị xuống dòng.
+- **Kích thước tối thiểu**: bảng danh sách rộng tối thiểu **320px**, trang chi tiết **640px** (cột danh sách 320px + cột chi tiết 640px). Tên bước ngắn thì ô vừa khít; tên bước dài tự xuống dòng tối đa **2 dòng** rồi cắt bằng `…`, không tràn ra ngoài ô.
 - **Shortcut desktop**: chạy `make-shortcut.bat` một lần để tạo shortcut trên desktop.
 
 ## Chạy (từ mã nguồn)
@@ -31,9 +32,9 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 
 ## Tải bản chạy trực tiếp
 
-- **Windows (portable)**: [deadline-0.1.0-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
-- **macOS — Apple Silicon (M1/M2/M3/M4)**: [deadline-0.1.0-mac-arm64.dmg](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-mac-arm64.dmg) (~127MB)
-- **macOS — Intel**: [deadline-0.1.0-mac-x64.dmg](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-mac-x64.dmg) (~134MB)
+- **Windows (portable)**: [deadline-0.2.0-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
+- **macOS — Apple Silicon (M1/M2/M3/M4)**: [deadline-0.2.0-mac-arm64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-mac-arm64.dmg)
+- **macOS — Intel**: [deadline-0.2.0-mac-x64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-mac-x64.dmg)
 
 Không rõ máy nào? Mở menu Apple (góc trên trái) → **About This Mac**: thấy **Apple M…** thì tải bản arm64, thấy **Intel Core** thì tải bản x64.
 
@@ -81,6 +82,9 @@ Chỉ cần làm một lần cho mỗi lần tải về. App chạy trên cả I
 - `npm start` — chạy app từ mã nguồn.
 - `npm test` — chạy unit test.
 - `node scripts/e2e.js` — chạy E2E test.
+- `node scripts/check-font.js` — kiểm tra tăng/giảm cỡ chữ không bẻ chữ, không tràn.
+- `node scripts/check-anchor.js` — kiểm tra ghim góc + ngưỡng rộng tối thiểu 2 cột.
+- `node scripts/check-layout-shot.js` — đo bố cục trạng thái 2/3 ở 100% và 160%, xuất ảnh ra `dist/_layout/`.
 - `npm run dist` — đóng gói portable .exe.
 
 ## Giấy phép

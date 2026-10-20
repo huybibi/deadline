@@ -80,26 +80,31 @@ body.mode-button #panel { display: none; }
   min-height: 0;
 }
 
+/* Trạng thái 2 (danh sách): cột danh sách co dãn nhưng không hẹp quá 320px —
+   cửa sổ cũng bị chặn ở đúng ngưỡng này (MIN_EXPANDED.width trong main.js) nên
+   chữ không bao giờ phải xuống dòng khi tăng cỡ chữ. */
 #col-list {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 320px;
+  min-width: 320px;
   display: flex;
   flex-direction: column;
 }
 
+/* Trạng thái 3: danh sách giữ tối thiểu 320px nhưng vẫn co dãn được khi cửa sổ
+   rộng ra (không cố định cứng như trước: width cứng 340px làm mọi thứ cứng nhắc,
+   còn flex-basis auto thì cột phình theo tên task dài → tràn ngang). */
 body.mode-detail #col-list {
-  flex: none;
-  width: 340px;
+  flex: 1 1 320px;
 }
 
 #col-detail {
-  flex: 1;
-  /* Tối thiểu 360px (đo với dữ liệu thật: hàng bước rộng nhất 214px, nút dài
-     nhất "Khách yêu cầu chỉnh sửa" 184px, header 217px). Trước đây là
-     min-width: 0 nên khi cửa sổ bị kéo hẹp, cột này bị ép về 0 — chỉ còn lại
-     viền 1px, chữ bẻ từng ký tự và đẩy thanh cuộn. Cửa sổ cũng bị chặn không
-     cho hẹp hơn ngưỡng tương ứng (DETAIL_MIN_WIDTH trong main.js). */
-  min-width: 360px;
+  /* Trạng thái 3: cột chi tiết tối thiểu 640px (tên bước ngắn vẫn thoải mái, tên
+     bước dài thì xuống dòng tối đa 2 dòng rồi "…"). Trước đây là 360px nên khi kéo
+     cửa sổ hẹp lại, cột này bị ép về 0 — chỉ còn lại viền 1px, chữ bẻ từng ký tự
+     và đẩy thanh cuộn. Cửa sổ cũng bị chặn không cho hẹp hơn ngưỡng tương ứng
+     (DETAIL_MIN_WIDTH trong main.js). */
+  flex: 2 1 640px;
+  min-width: 640px;
   border-left: 1px solid rgba(255, 255, 255, 0.4);
   padding-left: 12px;
   overflow-y: auto;
@@ -122,7 +127,7 @@ body.detail-left #col-detail {
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.35); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.35); border-radius: 2px; }
 
 #empty-state {
   opacity: 0.7;
@@ -309,12 +314,17 @@ input:disabled { opacity: 0.5; }
   margin-bottom: 10px;
 }
 
-.detail-heading { min-width: 0; }
+.detail-heading { flex: 1; min-width: 0; }
 
+/* tên task dài: xuống dòng tối đa 2 dòng rồi "…", không tràn ra ngoài ô */
 .detail-name {
   font-weight: bold;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
-  word-break: break-word;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .detail-meta {
@@ -343,23 +353,44 @@ input:disabled { opacity: 0.5; }
 
 .stage-top {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
 }
 
-.stage-label { font-weight: bold; }
+/* tên bước: co dãn theo chiều ngang, dài thì xuống dòng tối đa 2 dòng rồi "…" */
+.stage-label {
+  font-weight: bold;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
-.stage-owner { opacity: 0.8; font-size: 12px; text-align: right; }
+.stage-owner {
+  flex: none;
+  max-width: 45%;
+  opacity: 0.8;
+  font-size: 12px;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .stage-bottom {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 5px;
   font-size: 12px;
 }
 
-.stage-status { flex: 1; }
+.stage-status { flex: 1 1 auto; min-width: 0; }
 
 .rev-label {
   font-size: 11px;
