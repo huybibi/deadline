@@ -80,31 +80,28 @@ body.mode-button #panel { display: none; }
   min-height: 0;
 }
 
-/* Trạng thái 2 (danh sách): cột danh sách co dãn nhưng không hẹp quá 320px —
-   cửa sổ cũng bị chặn ở đúng ngưỡng này (MIN_EXPANDED.width trong main.js) nên
-   chữ không bao giờ phải xuống dòng khi tăng cỡ chữ. */
+/* Trạng thái 2 (danh sách): cửa sổ rộng tối thiểu 320px nên cột danh sách co
+   theo cửa sổ (min-width 0); tên task dài đã cắt bằng "…", dòng dưới tự xuống
+   hàng nên không bao giờ tràn ngang. */
 #col-list {
   flex: 1 1 320px;
-  min-width: 320px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
 
-/* Trạng thái 3: danh sách giữ tối thiểu 320px nhưng vẫn co dãn được khi cửa sổ
-   rộng ra (không cố định cứng như trước: width cứng 340px làm mọi thứ cứng nhắc,
-   còn flex-basis auto thì cột phình theo tên task dài → tràn ngang). */
+/* Trạng thái 3: danh sách và chi tiết mỗi cột tối thiểu 320px, co dãn đều nhau
+   khi kéo cửa sổ rộng ra (cửa sổ tối thiểu 674px = 320 + khe 12 + 320 + viền 22). */
 body.mode-detail #col-list {
   flex: 1 1 320px;
+  min-width: 320px;
 }
 
 #col-detail {
-  /* Trạng thái 3: cột chi tiết tối thiểu 640px (tên bước ngắn vẫn thoải mái, tên
-     bước dài thì xuống dòng tối đa 2 dòng rồi "…"). Trước đây là 360px nên khi kéo
-     cửa sổ hẹp lại, cột này bị ép về 0 — chỉ còn lại viền 1px, chữ bẻ từng ký tự
-     và đẩy thanh cuộn. Cửa sổ cũng bị chặn không cho hẹp hơn ngưỡng tương ứng
-     (DETAIL_MIN_WIDTH trong main.js). */
-  flex: 2 1 640px;
-  min-width: 640px;
+  /* Tên bước ngắn: cột 320px là đủ. Tên bước dài: xuống dòng tối đa 2 dòng rồi
+     "…" (xem .stage-label). Ngưỡng cửa sổ tương ứng: DETAIL_MIN_WIDTH (main.js). */
+  flex: 1 1 320px;
+  min-width: 320px;
   border-left: 1px solid rgba(255, 255, 255, 0.4);
   padding-left: 12px;
   overflow-y: auto;

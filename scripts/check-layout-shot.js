@@ -131,10 +131,10 @@ function measure() {
   await app.whenReady();
   const results = [];
   const cases = [
-    { mode: 'panel', width: 342, zoom: 1 },
-    { mode: 'panel', width: 342, zoom: 1.6 },
-    { mode: 'detail', width: 994, zoom: 1 },
-    { mode: 'detail', width: 994, zoom: 1.6 },
+    { mode: 'panel', width: 320, zoom: 1 },
+    { mode: 'panel', width: 320, zoom: 1.6 },
+    { mode: 'detail', width: 674, zoom: 1 },
+    { mode: 'detail', width: 674, zoom: 1.6 },
   ];
 
   const win = new BrowserWindow({

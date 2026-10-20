@@ -11,18 +11,16 @@ const SIZES = {
   // không bị Windows xén mất ở màn hình scale phân số (125%/150%)
   button: { width: 152, height: 46 },
   panel: { width: 540, height: 660 },
-  // >= DETAIL_MIN_WIDTH (994) để mở chi tiết là thấy đủ 2 cột ngay từ đầu
-  detail: { width: 1000, height: 660 },
+  // mở chi tiết: danh sách 320 + khe 12 + chi tiết 320 + viền/padding 22
+  detail: { width: 320 + 12 + 320 + 22, height: 660 },
 };
-// Cột danh sách tối thiểu 320px (xem #col-list trong style.css); cửa sổ phải rộng
-// thêm phần viền 2px + padding 20px của #panel thì cột mới đủ 320px mà không tràn.
-const PANEL_MIN_COL = 320;
-const PANEL_CHROME = 22;
-const MIN_EXPANDED = { width: PANEL_MIN_COL + PANEL_CHROME, height: 420 };
-// Chi tiết gồm 2 cột: danh sách 320px + khe 12px + cột chi tiết tối thiểu 640px
-// (xem #col-detail trong style.css) + viền/padding panel 22px. Chặn cửa sổ không
-// cho hẹp hơn ngưỡng này, nếu không cột chi tiết bị ép về 0 (chỉ còn viền 1px).
-const DETAIL_MIN_WIDTH = PANEL_MIN_COL + 12 + 640 + PANEL_CHROME;
+// Cửa sổ tối thiểu của trạng thái 2 (bảng danh sách) = 320px: cột danh sách co
+// theo cửa sổ (#col-list min-width 0), chữ dài đã cắt bằng "…" nên không tràn.
+const MIN_EXPANDED = { width: 320, height: 420 };
+// Trạng thái 3: danh sách 320px + khe 12px + chi tiết 320px + viền/padding panel
+// 22px = 674px, cũng là chiều rộng mặc định khi mở chi tiết (2 cột bằng nhau).
+const DETAIL_COL = 320;
+const DETAIL_MIN_WIDTH = DETAIL_COL + 12 + DETAIL_COL + 22;
 
 // chiều rộng nhỏ nhất của cửa sổ theo chế độ (chi tiết phải đủ chỗ cho 2 cột)
 function minWidthFor(m) {
@@ -412,3 +410,6 @@ function setFontScale(next) {
 
 ipcMain.handle('ui:get-font-scale', () => fontScale);
 ipcMain.handle('ui:set-font-scale', (_e, v) => setFontScale(v));
+// ngưỡng nhỏ nhất theo chế độ hiện tại, để renderer kéo mép không đẩy cửa sổ
+// xuống dưới ngưỡng rồi bị main ép ngược lại (nguồn sự thật duy nhất nằm ở đây)
+ipcMain.handle('ui:get-min-size', () => ({ width: minWidthFor(mode), height: MIN_EXPANDED.height }));

@@ -80,15 +80,22 @@ const { _electron: electron } = require('playwright');
   assert.ok(covers(panel0, home), 'mở bảng: bảng đè lên nút');
   console.log('ok - mo bang: hien tai dung vi tri nut');
 
+  // 2b. ngưỡng hẹp nhất của bảng danh sách là 320px: kéo xuống 250 vẫn dừng ở 320
+  await apiBounds({ x: panel0.x, y: panel0.y, width: 250, height: 660 });
+  await win.waitForTimeout(400);
+  assert.strictEqual((await getWin()).width, 320, 'bảng danh sách: ngưỡng hẹp nhất 320px');
+  console.log('ok - bang danh sach: nguong hep nhat 320px');
+
   // 3. chỉnh bảng 600×900 → mở chi tiết: chỗ đứng yên, chiều rộng riêng (mặc định
-  //    1000), chiều cao đồng bộ theo bảng; cột chi tiết bên phải, danh sách giữ mép trái
+  //    674 = danh sách 320 + khe 12 + chi tiết 320 + viền 22), chiều cao đồng bộ
+  //    theo bảng; cột chi tiết bên phải, danh sách giữ mép trái
   await apiBounds({ x: panel0.x, y: panel0.y, width: 600, height: 900 });
   await win.waitForTimeout(400);
   const panel1 = await getWin();
   const listPanel = await cols();
   await openDetail();
   const d1 = await getWin();
-  assert.deepStrictEqual(d1, { x: panel1.x, y: panel1.y, width: 1000, height: panel1.height },
+  assert.deepStrictEqual(d1, { x: panel1.x, y: panel1.y, width: 674, height: panel1.height },
     'mở chi tiết: mép trái + chiều cao giữ nguyên, chiều rộng riêng');
   assert.strictEqual(await win.locator('body.detail-left').count(), 0, 'đủ chỗ phải: không lật cột');
   const ord1 = await cols();
@@ -174,7 +181,7 @@ const { _electron: electron } = require('playwright');
   console.log('ok - khoi dong lai: luu dung rong rieng + cao chung');
 
   // 9. cột chi tiết có ngưỡng tối thiểu: kéo cửa sổ hẹp hết cỡ ở chế độ chi tiết
-  //    thì cửa sổ dừng ở 994px, cột chi tiết vẫn >= 640px — không tràn ngang,
+  //    thì cửa sổ dừng ở 674px, mỗi cột vẫn >= 320px — không tràn ngang,
   //    không bẻ chữ ở hàng bước / hàng nút, không sinh thanh cuộn dọc
   app = await launch();
   win = await app.firstWindow();
@@ -186,7 +193,7 @@ const { _electron: electron } = require('playwright');
   await apiBounds({ x: beforeMin.x, y: beforeMin.y, width: 380, height: 750 });
   await win.waitForTimeout(400);
   const dMin = await getWin();
-  assert.strictEqual(dMin.width, 320 + 12 + 640 + 22,
+  assert.strictEqual(dMin.width, 320 + 12 + 320 + 22,
     'kéo chi tiết hẹp hết cỡ: cửa sổ dừng ở ngưỡng 2 cột');
   const min = await win.evaluate(() => {
     const d = document.querySelector('#col-detail');
@@ -209,7 +216,7 @@ const { _electron: electron } = require('playwright');
     for (const b of d.querySelectorAll('button')) if (lines(b) > 1) r.wrapBad++;
     return r;
   });
-  assert.ok(min.w >= 640, `cột chi tiết >= 640px (được ${Math.round(min.w)}px)`);
+  assert.ok(min.w >= 320, `mỗi cột >= 320px (cột chi tiết được ${Math.round(min.w)}px)`);
   assert.strictEqual(min.overflow, 0, 'hẹp nhất: không tràn ngang');
   assert.strictEqual(min.wrapBad, 0, 'hẹp nhất: không bẻ chữ ở hàng bước / hàng nút');
   assert.ok(min.scroll <= 0, `hẹp nhất: không thanh cuộn dọc (thừa ${min.scroll}px)`);

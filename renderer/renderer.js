@@ -61,6 +61,8 @@ function findTask(id) {
 // ---------- chế độ cửa sổ ----------
 api.onMode((m, side) => {
   state.mode = m;
+  // ngưỡng kéo mép đổi theo chế độ (bảng 320px, chi tiết 674px)
+  api.getMinSize().then((s) => { if (s) minSize = s; });
   // chi tiết nở trái (bảng gần mép phải màn hình, thiếu chỗ): cột chi tiết bên trái
   document.body.className = 'mode-' + m + (m === 'detail' && side === 'left' ? ' detail-left' : '');
   if (m !== 'detail') state.detailTaskId = null;
@@ -511,6 +513,9 @@ makeDraggable($('#panel-drag'), (e) => !e.target.closest('button'));
 let rs = null;
 let rsBusy = false;
 let rsSeq = 0;
+// ngưỡng nhỏ nhất do main.js quyết (320px ở bảng danh sách, 674px khi mở chi tiết)
+let minSize = { width: 320, height: 420 };
+api.getMinSize().then((s) => { if (s) minSize = s; });
 $$('.rs').forEach((h) => {
   h.addEventListener('mousedown', async (e) => {
     if (e.button !== 0) return;
@@ -541,8 +546,8 @@ window.addEventListener('mousemove', async () => {
     if (dir.includes('w')) w = b.width - dx;
     if (dir.includes('n')) h = b.height - dy;
     // giữ cạnh đối lập đứng yên khi kéo cạnh trái/trên; chặn dưới kích thước tối thiểu
-    w = Math.max(380, w);
-    h = Math.max(420, h);
+    w = Math.max(minSize.width, w);
+    h = Math.max(minSize.height, h);
     if (dir.includes('w')) x = b.x + (b.width - w);
     if (dir.includes('n')) y = b.y + (b.height - h);
     api.setBounds({ x, y, width: w, height: h });

@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('api', {
   setScrim: (v) => ipcRenderer.send('ui:set-scrim', v),
   getFontScale: () => ipcRenderer.invoke('ui:get-font-scale'),
   setFontScale: (v) => ipcRenderer.invoke('ui:set-font-scale', v),
+  getMinSize: () => ipcRenderer.invoke('ui:get-min-size'),
   onMode: (cb) => ipcRenderer.on('mode', (_e, m, side) => cb(m, side)),
   tasks: {
     get: () => ipcRenderer.invoke('data:get'),

@@ -23,7 +23,7 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 - **Vòng chỉnh sửa**: khách yêu cầu sửa → thêm vòng mới (Chỉnh sửa lần N) + hạn nộp lại.
 - **Thẩm pháp mono**: trắng/đen/xám, viền 1px, nền trong suốt + scrim nhẹ; khẩn cấp = chữ đậm + nhãn, không dùng màu.
 - **Cỡ chữ**: nút **−** / **+** ở đáy bảng tăng giảm cỡ chữ (80%–160%); các ô bao quanh chữ tự phóng to theo, không bị xuống dòng.
-- **Kích thước tối thiểu**: bảng danh sách rộng tối thiểu **320px**, trang chi tiết **640px** (cột danh sách 320px + cột chi tiết 640px). Tên bước ngắn thì ô vừa khít; tên bước dài tự xuống dòng tối đa **2 dòng** rồi cắt bằng `…`, không tràn ra ngoài ô.
+- **Kích thước tối thiểu**: bảng danh sách kéo hẹp được tới **320px**; mở chi tiết thì bảng danh sách **320px** + bảng chi tiết **320px** (cửa sổ 674px, cũng là chiều rộng mặc định khi mở chi tiết). Tên bước ngắn thì ô vừa khít; tên bước dài tự xuống dòng tối đa **2 dòng** rồi cắt bằng `…`, không tràn ra ngoài ô.
 - **Shortcut desktop**: chạy `make-shortcut.bat` một lần để tạo shortcut trên desktop.
 
 ## Chạy (từ mã nguồn)

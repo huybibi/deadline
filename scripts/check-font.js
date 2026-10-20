@@ -156,8 +156,11 @@ const { _electron: electron } = require('playwright');
     detail: first.detail.w / first.scale,
     list: first.list.w / first.scale,
   };
-  assert.ok(logical.detail >= 359, `cột chi tiết mặc định >= 360 (đang ${logical.detail})`);
+  assert.ok(logical.detail >= 319, `cột chi tiết mặc định >= 320 (đang ${logical.detail})`);
 
+  // dung sai 4px: cửa sổ hẹp 674px nên sai số làm tròn dev() mỗi bước cỡ chữ
+  // cộng dồn lớn hơn so với hồi cửa sổ chi tiết rộng 1000px (vẫn < 0.6%)
+  const EPS = 4;
   const stepCheck = async (label) => {
     const p = await probe();
     const b = await getWin();
@@ -165,13 +168,13 @@ const { _electron: electron } = require('playwright');
     const lh = b.height / p.scale;
     const dw = p.detail.w / p.scale;
     const lsw = p.list.w / p.scale;
-    assert.ok(Math.abs(lw - logical.win) <= 2,
+    assert.ok(Math.abs(lw - logical.win) <= EPS,
       `${label}: rộng cửa sổ theo đơn vị bố cục giữ nguyên (${lw.toFixed(1)} vs ${logical.win})`);
-    assert.ok(Math.abs(lh - logical.height) <= 2,
+    assert.ok(Math.abs(lh - logical.height) <= EPS,
       `${label}: cao cửa sổ theo đơn vị bố cục giữ nguyên (${lh.toFixed(1)} vs ${logical.height})`);
-    assert.ok(dw >= 359, `${label}: cột chi tiết còn >= 360 đơn vị bố cục (đang ${dw.toFixed(1)})`);
-    assert.ok(Math.abs(dw - logical.detail) <= 2, `${label}: cột chi tiết không trôi (${dw.toFixed(1)})`);
-    assert.ok(Math.abs(lsw - logical.list) <= 2, `${label}: cột danh sách không trôi (${lsw.toFixed(1)})`);
+    assert.ok(dw >= 319, `${label}: cột chi tiết còn >= 320 đơn vị bố cục (đang ${dw.toFixed(1)})`);
+    assert.ok(Math.abs(dw - logical.detail) <= EPS, `${label}: cột chi tiết không trôi (${dw.toFixed(1)})`);
+    assert.ok(Math.abs(lsw - logical.list) <= EPS, `${label}: cột danh sách không trôi (${lsw.toFixed(1)})`);
     assert.ok(p.overflowX <= 0, `${label}: không tràn ngang (${p.overflowX}px)`);
     assert.ok(p.scrollY <= 0, `${label}: không sinh thanh cuộn dọc (${p.scrollY}px)`);
     assert.deepEqual(p.wrapBad, [], `${label}: không chữ nào bị xuống dòng [${p.wrapBad.join(' | ')}]`);
