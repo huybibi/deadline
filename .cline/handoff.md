@@ -2,6 +2,7 @@
 _Cập nhật: 20/10/2026 (v0.2.0 — bố cục co dãn theo cỡ chữ + ngưỡng rộng tối thiểu)_
 
 ## v0.2.0 (20/10/2026) — bố cục trạng thái 2 & 3
+- **ĐÃ GỠ bản phát hành v0.2.0 khỏi GitHub (20/10/2026)**: người dùng báo có bug mới → xoá release + tag v0.2.0, README trả link tải về v0.1.0, xoá `.github/workflows/win.yml`, `mac.yml` trả tag v0.1.0. Code bố cục mới **vẫn giữ trên nhánh main** để sửa bug rồi phát hành lại; `package.json` vẫn 0.2.0. Release mới nhất trên GitHub hiện là **v0.1.0**.
 - Trạng thái 2 (bảng danh sách): cửa sổ rộng tối thiểu 342px → cột danh sách đúng **320px** (320 + viền 2px + padding 20px). Cột `#col-list` dùng `flex: 1 1 320px; min-width: 320px` nên co dãn được, không còn cứng như trước.
 - Trạng thái 3 (chi tiết): cửa sổ tối thiểu **994px** = danh sách 320 + khe 12 + cột chi tiết 640 + viền/padding 22 (`DETAIL_MIN_WIDTH` trong main.js). Cột chi tiết `flex: 2 1 640px; min-width: 640px`; danh sách `flex: 1 1 320px`.
   - Bỏ `width: 340px` cứng của `#col-list` (nay co dãn), bỏ nguy cơ `flex: none` phình theo tên task dài.

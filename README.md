@@ -32,9 +32,9 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 
 ## Tải bản chạy trực tiếp
 
-- **Windows (portable)**: [deadline-0.2.0-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
-- **macOS — Apple Silicon (M1/M2/M3/M4)**: [deadline-0.2.0-mac-arm64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-mac-arm64.dmg)
-- **macOS — Intel**: [deadline-0.2.0-mac-x64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-mac-x64.dmg)
+- **Windows (portable)**: [deadline-0.1.0-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
+- **macOS — Apple Silicon (M1/M2/M3/M4)**: [deadline-0.1.0-mac-arm64.dmg](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-mac-arm64.dmg) (~127MB)
+- **macOS — Intel**: [deadline-0.1.0-mac-x64.dmg](https://github.com/huybibi/deadline/releases/download/v0.1.0/deadline-0.1.0-mac-x64.dmg) (~134MB)
 
 Không rõ máy nào? Mở menu Apple (góc trên trái) → **About This Mac**: thấy **Apple M…** thì tải bản arm64, thấy **Intel Core** thì tải bản x64.
 
