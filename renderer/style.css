@@ -90,16 +90,18 @@ body.mode-button #panel { display: none; }
   flex-direction: column;
 }
 
-/* Trạng thái 3: danh sách và chi tiết mỗi cột tối thiểu 320px, co dãn đều nhau
-   khi kéo cửa sổ rộng ra (cửa sổ tối thiểu 674px = 320 + khe 12 + 320 + viền 22). */
+/* Trạng thái 3: cột danh sách GIỮ NGUYÊN chiều rộng như lúc ở trạng thái 2 (biến
+   --list-w do main.js gửi sang), chỉ cột chi tiết nở thêm bên cạnh; cột chi tiết
+   tối thiểu 320px rồi co dãn theo phần cửa sổ còn lại. */
 body.mode-detail #col-list {
-  flex: 1 1 320px;
-  min-width: 320px;
+  flex: 0 0 auto;
+  width: var(--list-w, 320px);
+  min-width: 0;
 }
 
 #col-detail {
   /* Tên bước ngắn: cột 320px là đủ. Tên bước dài: xuống dòng tối đa 2 dòng rồi
-     "…" (xem .stage-label). Ngưỡng cửa sổ tương ứng: DETAIL_MIN_WIDTH (main.js). */
+     "…" (xem .stage-label). Ngưỡng cửa sổ tương ứng: minWidthFor() (main.js). */
   flex: 1 1 320px;
   min-width: 320px;
   border-left: 1px solid rgba(255, 255, 255, 0.4);

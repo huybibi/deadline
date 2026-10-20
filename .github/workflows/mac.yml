@@ -51,10 +51,10 @@ jobs:
             dist/*.dmg
             dist/*.zip
 
-      - name: Đưa lên release v0.2.0
+      - name: Đưa lên release v0.2.1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: v0.2.0
+          TAG: v0.2.1
         # release có thể chưa tồn tại (lần đầu đẩy tag) → tạo trước rồi mới upload
         run: |
           gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "deadline $TAG" --notes "Bản dựng cho tag $TAG."

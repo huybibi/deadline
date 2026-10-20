@@ -1,5 +1,13 @@
 # Bàn giao — Widget "deadline" (quản lý deadline cho account manager)
-_Cập nhật: 20/10/2026 (v0.2.0 — bố cục co dãn theo cỡ chữ + ngưỡng rộng tối thiểu)_
+_Cập nhật: 20/10/2026 (v0.2.1 — mở chi tiết không làm cột danh sách đổi rộng)_
+
+## v0.2.1 (20/10/2026) — cột danh sách cố định khi mở chi tiết
+- **Bug**: cột danh sách đang rộng X, bấm mở chi tiết thì thành X + N (do 2 cột chia đều flex). Đã sửa: cột danh sách **giữ đúng X**, chỉ cột chi tiết nở thêm.
+  - Renderer đo chiều rộng cột danh sách từ DOM rồi gửi kèm `openDetail(listW)`; main chốt `detailListW` + đo luôn viền/padding panel (`detailChrome = cửa sổ - cột danh sách`), nhờ vậy không phụ thuộc hằng số CSS.
+  - CSS: `body.mode-detail #col-list { flex: 0 0 auto; width: var(--list-w, 320px); min-width: 0; }`; `#col-detail { flex: 1 1 320px; min-width: 320px; }` (cửa sổ rộng ra thì chỉ cột chi tiết nở).
+  - Lưu layout: chỉ lưu **chiều rộng cột chi tiết** (`position.json` → `detail.col`), có migrate file cũ (`detail.width` = chiều rộng cửa sổ ngày trước).
+  - Đổi cỡ chữ: chiều rộng cửa sổ tính lại từ `detailListW + khe + cột + viền` và `floor` khi suy cột chi tiết → không còn cộng dồn sai số làm tròn (trước đây mỗi bước +1px).
+- Kiểm thử: `npm test` 7/7, `scripts/e2e.js` PASS, `scripts/check-font.js` PASS (160→80%, cột chi tiết 320 đơn vị bố cục, tràn 0/cuộn 0/bẻ chữ 0), `scripts/check-anchor.js` PASS (thêm assert cột danh sách không đổi rộng khi mở chi tiết), `scripts/check-layout-shot.js` PASS (518 + 320 ở 872px; 518 cố định khi kéo tới 1100px).
 
 ## v0.2.0 (20/10/2026) — bố cục trạng thái 2 & 3
 - **PHÁT HÀNH LẠI v0.2.0 (20/10/2026)**: sau khi sửa ngưỡng 320/674, người dùng xác nhận ổn → tạo lại tag `v0.2.0`, release `v0.2.0` (exe portable do máy Windows dựng + dmg/zip mac do `mac.yml` dựng trên runner macOS), README trỏ lại link v0.2.0, `mac.yml` đặt `TAG: v0.2.0`.

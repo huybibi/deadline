@@ -5,7 +5,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('api', {
   openPanel: () => ipcRenderer.send('widget:open-panel'),
   closePanel: () => ipcRenderer.send('widget:close-panel'),
-  openDetail: () => ipcRenderer.send('widget:open-detail'),
+  openDetail: (listW) => ipcRenderer.send('widget:open-detail', listW),
   closeDetail: () => ipcRenderer.send('widget:close-detail'),
   hideWidget: () => ipcRenderer.send('widget:hide'),
   quit: () => ipcRenderer.send('widget:quit'),
@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld('api', {
   getFontScale: () => ipcRenderer.invoke('ui:get-font-scale'),
   setFontScale: (v) => ipcRenderer.invoke('ui:set-font-scale', v),
   getMinSize: () => ipcRenderer.invoke('ui:get-min-size'),
-  onMode: (cb) => ipcRenderer.on('mode', (_e, m, side) => cb(m, side)),
+  onMode: (cb) => ipcRenderer.on('mode', (_e, m, side, listW) => cb(m, side, listW)),
   tasks: {
     get: () => ipcRenderer.invoke('data:get'),
     add: (payload) => ipcRenderer.invoke('data:addTask', payload),

@@ -11,20 +11,61 @@ const SIZES = {
   // không bị Windows xén mất ở màn hình scale phân số (125%/150%)
   button: { width: 152, height: 46 },
   panel: { width: 540, height: 660 },
-  // mở chi tiết: danh sách 320 + khe 12 + chi tiết 320 + viền/padding 22
-  detail: { width: 320 + 12 + 320 + 22, height: 660 },
 };
 // Cửa sổ tối thiểu của trạng thái 2 (bảng danh sách) = 320px: cột danh sách co
 // theo cửa sổ (#col-list min-width 0), chữ dài đã cắt bằng "…" nên không tràn.
 const MIN_EXPANDED = { width: 320, height: 420 };
-// Trạng thái 3: danh sách 320px + khe 12px + chi tiết 320px + viền/padding panel
-// 22px = 674px, cũng là chiều rộng mặc định khi mở chi tiết (2 cột bằng nhau).
+// Bố cục 2 cột: khe 12px giữa 2 cột. Viền + padding của #panel KHÔNG dùng hằng số:
+// đo ngay lúc mở chi tiết (= chiều rộng cửa sổ - chiều rộng cột danh sách) nên khớp
+// tuyệt đối với CSS, đổi padding sau này cũng không lệch.
+const DETAIL_GAP = 12;
+// Cột chi tiết tối thiểu 320px (tên bước ngắn vừa đủ).
 const DETAIL_COL = 320;
-const DETAIL_MIN_WIDTH = DETAIL_COL + 12 + DETAIL_COL + 22;
+// dự phòng khi chưa đo được (mở chi tiết không đi qua bảng danh sách)
+const PANEL_CHROME = 23;
+
+// Cột danh sách + viền panel (đơn vị logic) chốt lúc mở chi tiết: cột danh sách giữ
+// ĐÚNG chiều rộng đang thấy ở trạng thái 2, kéo cửa sổ chi tiết rộng ra chỉ cột chi
+// tiết nở thêm.
+let detailListW = null;
+let detailChrome = null;
+// renderer báo chiều rộng cột danh sách ngay trước khi mở chi tiết (đo từ DOM)
+let pendingListW = null;
+
+function detailCol() {
+  return Math.max(DETAIL_COL, Math.round(layout.detailCol) || 0);
+}
+
+function chromeNow() {
+  return detailChrome == null ? PANEL_CHROME : detailChrome;
+}
+
+// Chiều rộng cửa sổ khi mở chi tiết = cột danh sách (giữ nguyên) + khe + cột chi tiết
+// + viền/padding panel.
+function detailWindowWidth() {
+  return (detailListW || 1) + DETAIL_GAP + detailCol() + chromeNow();
+}
 
 // chiều rộng nhỏ nhất của cửa sổ theo chế độ (chi tiết phải đủ chỗ cho 2 cột)
 function minWidthFor(m) {
-  return m === 'detail' ? DETAIL_MIN_WIDTH : MIN_EXPANDED.width;
+  if (m !== 'detail') return MIN_EXPANDED.width;
+  return (detailListW || DETAIL_COL) + DETAIL_GAP + DETAIL_COL + chromeNow();
+}
+
+// Chiều rộng cửa sổ theo đơn vị logic, tính lại từ trạng thái hiện tại (đổi cỡ chữ
+// không được cộng dồn sai số làm tròn).
+function logicalTargetWidth() {
+  const b = win.getBounds();
+  if (mode === 'detail' && detailListW) {
+    // floor chứ không round: cửa sổ lệch lên nửa px do làm tròn dev() không được
+    // cộng dồn thành +1px mỗi lần đổi cỡ chữ
+    const col = Math.max(DETAIL_COL,
+      Math.floor(undev(b.width)) - detailListW - DETAIL_GAP - chromeNow());
+    return detailListW + DETAIL_GAP + col + chromeNow();
+  }
+  const panelW = Number.isFinite(layout.panelWidth) ? layout.panelWidth : null;
+  if (panelW && Math.abs(dev(panelW) - b.width) <= 2) return panelW;
+  return Math.round(undev(b.width));
 }
 
 // Cỡ chữ: 0.8–1.6, bước 0.1. Mọi kích thước bố cục ở trên là đơn vị LOGIC; cửa sổ
@@ -44,7 +85,7 @@ let fixBusy = false;
 // layout: vị trí nút + kích thước bảng. CHIỀU CAO dùng chung cho cả 2 trạng
 // thái (thu gọn danh sách / mở chi tiết) — chỉnh ở trạng thái nào trạng thái
 // kia cũng theo; CHIỀU RỘNG riêng từng trạng thái.
-let layout = { button: null, panelWidth: null, detailWidth: null, height: null };
+let layout = { button: null, panelWidth: null, detailCol: null, height: null };
 
 // Cho phép test E2E dùng thư mục dữ liệu riêng, không đụng dữ liệu thật
 if (process.env.DEADLINE_USER_DIR) app.setPath('userData', process.env.DEADLINE_USER_DIR);
@@ -66,9 +107,12 @@ function loadLayout() {
     const pb = raw.panel || {};
     const db = raw.detail || {};
     if (Number.isFinite(pb.width) && pb.width >= MIN_EXPANDED.width) layout.panelWidth = pb.width;
+    // file cũ lưu chiều rộng CỬA SỔ chi tiết → đổi sang chiều rộng CỘT chi tiết
     if (Number.isFinite(db.width) && db.width >= MIN_EXPANDED.width) {
-      layout.detailWidth = Math.max(db.width, DETAIL_MIN_WIDTH);
+      layout.detailCol = Math.max(DETAIL_COL,
+        db.width - (layout.panelWidth || SIZES.panel.width) - DETAIL_GAP - PANEL_CHROME);
     }
+    if (Number.isFinite(db.col)) layout.detailCol = Math.max(DETAIL_COL, db.col);
     const h = Number.isFinite(raw.height) ? raw.height
       : Number.isFinite(pb.height) ? pb.height
       : db.height;
@@ -78,7 +122,7 @@ function loadLayout() {
     // dùng → dùng mặc định để chỉnh lại một lần, từ đó nhớ riêng
     if (!Number.isFinite(raw.height) &&
         pb.width === db.width && pb.height === db.height) {
-      layout.detailWidth = null;
+      layout.detailCol = null;
     }
   } catch (_) { /* chưa có file */ }
 }
@@ -99,13 +143,18 @@ function persistLayout() {
     // lưu theo đơn vị logic (chia fontScale) để đổi cỡ chữ không làm trôi bố cục
     layout.height = Math.round(undev(b.height));
     if (mode === 'panel') layout.panelWidth = Math.round(undev(b.width));
-    else layout.detailWidth = Math.round(undev(b.width));
+    else if (detailListW) {
+      // lưu chiều rộng CỘT chi tiết (không lưu cửa sổ) để cột danh sách đổi rộng
+      // bao nhiêu cũng không kéo theo cột chi tiết
+      layout.detailCol = Math.max(DETAIL_COL,
+        Math.floor(undev(b.width)) - detailListW - DETAIL_GAP - chromeNow());
+    }
   }
   try {
     const out = { button: layout.button };
     if (Number.isFinite(layout.height)) out.height = layout.height;
     if (Number.isFinite(layout.panelWidth)) out.panel = { width: layout.panelWidth };
-    if (Number.isFinite(layout.detailWidth)) out.detail = { width: layout.detailWidth };
+    if (Number.isFinite(layout.detailCol)) out.detail = { col: layout.detailCol };
     fs.writeFileSync(positionFile(), JSON.stringify(out));
   } catch (_) { /* không ghi được thì giữ layout trong bộ nhớ */ }
 }
@@ -165,17 +214,23 @@ function setMode(next) {
       h = layout.height || SIZES.panel.height;
     }
   } else {
-    // mở chi tiết: chiều rộng riêng, chiều cao giữ nguyên (đồng bộ với bảng)
-    w = Math.max(layout.detailWidth || SIZES.detail.width, DETAIL_MIN_WIDTH);
+    // mở chi tiết: cột danh sách giữ NGUYÊN đúng chiều rộng đang thấy, chỉ cột chi
+    // tiết nở thêm sang bên cạnh; chiều cao giữ nguyên (đồng bộ với bảng)
+    const w0 = Math.round(undev(cur.width));
+    // cột danh sách: ưu tiên số renderer đo được từ DOM, thiếu thì suy từ cửa sổ
+    detailListW = pendingListW || Math.max(1, w0 - PANEL_CHROME);
+    // viền + padding panel = cửa sổ trừ cột danh sách (đo thật, không dùng hằng số)
+    detailChrome = mode === 'panel' ? Math.max(0, w0 - detailListW) : chromeNow();
+    w = detailWindowWidth();
     h = undev(cur.height);
-    panelBounds = { x: cur.x, y: cur.y, width: undev(cur.width), height: h };
+    panelBounds = { x: cur.x, y: cur.y, width: w0, height: h };
     detailSide = cur.x + dev(w) <= wa.x + wa.width ? 'right' : 'left';
     if (detailSide === 'left') x = cur.x + cur.width - dev(w);
   }
   const p = clampTo(x, y, dev(w), dev(h), wa);
   mode = next;
   win.setBounds({ x: p.x, y: p.y, width: dev(w), height: dev(h) });
-  win.webContents.send('mode', mode, detailSide);
+  win.webContents.send('mode', mode, detailSide, detailListW || 0);
 }
 
 function createWindow() {
@@ -304,7 +359,13 @@ function createTray() {
 // ---------- IPC điều khiển cửa sổ ----------
 ipcMain.on('widget:open-panel', () => setMode('panel'));
 ipcMain.on('widget:close-panel', () => setMode('button'));
-ipcMain.on('widget:open-detail', () => setMode('detail'));
+ipcMain.on('widget:open-detail', (_e, listW) => {
+  // renderer đo chiều rộng cột danh sách từ DOM rồi gửi kèm: mở chi tiết xong cột
+  // danh sách vẫn đúng bằng chiều rộng đang thấy, không nở thêm vài px
+  if (Number.isFinite(listW) && listW > 0) pendingListW = Math.round(listW);
+  setMode('detail');
+  pendingListW = null;
+});
 ipcMain.on('widget:close-detail', () => setMode('panel'));
 ipcMain.on('widget:hide', () => win && win.hide());
 ipcMain.on('widget:quit', () => app.quit());
@@ -395,7 +456,7 @@ function setFontScale(next) {
     return fontScale;
   }
   const b = win.getBounds();
-  const lw = b.width / fontScale; // đơn vị logic theo cỡ chữ CŨ
+  const lw = logicalTargetWidth(); // đơn vị logic theo cỡ chữ CŨ, không cộng dồn sai số
   const lh = b.height / fontScale;
   fontScale = want;
   writeSettings({ fontScale: want });

@@ -23,7 +23,7 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 - **Vòng chỉnh sửa**: khách yêu cầu sửa → thêm vòng mới (Chỉnh sửa lần N) + hạn nộp lại.
 - **Thẩm pháp mono**: trắng/đen/xám, viền 1px, nền trong suốt + scrim nhẹ; khẩn cấp = chữ đậm + nhãn, không dùng màu.
 - **Cỡ chữ**: nút **−** / **+** ở đáy bảng tăng giảm cỡ chữ (80%–160%); các ô bao quanh chữ tự phóng to theo, không bị xuống dòng.
-- **Kích thước tối thiểu**: bảng danh sách kéo hẹp được tới **320px**; mở chi tiết thì bảng danh sách **320px** + bảng chi tiết **320px** (cửa sổ 674px, cũng là chiều rộng mặc định khi mở chi tiết). Tên bước ngắn thì ô vừa khít; tên bước dài tự xuống dòng tối đa **2 dòng** rồi cắt bằng `…`, không tràn ra ngoài ô.
+- **Kích thước tối thiểu**: bảng danh sách kéo hẹp được tới **320px**; mở chi tiết thì cột danh sách **giữ nguyên đúng chiều rộng đang có**, cột chi tiết tối thiểu **320px** nở thêm bên cạnh. Tên bước ngắn thì ô vừa khít; tên bước dài tự xuống dòng tối đa **2 dòng** rồi cắt bằng `…`, không tràn ra ngoài ô.
 - **Shortcut desktop**: chạy `make-shortcut.bat` một lần để tạo shortcut trên desktop.
 
 ## Chạy (từ mã nguồn)
@@ -32,9 +32,9 @@ Widget desktop nhẹ cho account manager: **quản lý task theo hạn giao khá
 
 ## Tải bản chạy trực tiếp
 
-- **Windows (portable)**: [deadline-0.2.0-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
-- **macOS — Apple Silicon (M1/M2/M3/M4)**: [deadline-0.2.0-mac-arm64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-mac-arm64.dmg) (~121MB)
-- **macOS — Intel**: [deadline-0.2.0-mac-x64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.0/deadline-0.2.0-mac-x64.dmg) (~128MB)
+- **Windows (portable)**: [deadline-0.2.1-portable.exe](https://github.com/huybibi/deadline/releases/download/v0.2.1/deadline-0.2.1-portable.exe) (~100MB) — tải về, bấm đúp chạy luôn.
+- **macOS — Apple Silicon (M1/M2/M3/M4)**: [deadline-0.2.1-mac-arm64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.1/deadline-0.2.1-mac-arm64.dmg) (~121MB)
+- **macOS — Intel**: [deadline-0.2.1-mac-x64.dmg](https://github.com/huybibi/deadline/releases/download/v0.2.1/deadline-0.2.1-mac-x64.dmg) (~128MB)
 
 Không rõ máy nào? Mở menu Apple (góc trên trái) → **About This Mac**: thấy **Apple M…** thì tải bản arm64, thấy **Intel Core** thì tải bản x64.
 

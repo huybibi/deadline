@@ -59,9 +59,13 @@ function findTask(id) {
 }
 
 // ---------- chế độ cửa sổ ----------
-api.onMode((m, side) => {
+api.onMode((m, side, listW) => {
   state.mode = m;
-  // ngưỡng kéo mép đổi theo chế độ (bảng 320px, chi tiết 674px)
+  // cột danh sách giữ đúng chiều rộng đang có khi mở chi tiết (không nở ra)
+  if (Number.isFinite(listW)) {
+    document.documentElement.style.setProperty('--list-w', listW + 'px');
+  }
+  // ngưỡng kéo mép đổi theo chế độ (bảng 320px, chi tiết = danh sách + 320 + khe)
   api.getMinSize().then((s) => { if (s) minSize = s; });
   // chi tiết nở trái (bảng gần mép phải màn hình, thiếu chỗ): cột chi tiết bên trái
   document.body.className = 'mode-' + m + (m === 'detail' && side === 'left' ? ' detail-left' : '');
@@ -72,7 +76,11 @@ api.onMode((m, side) => {
 
 function openDetail(id) {
   state.detailTaskId = id;
-  api.openDetail();
+  // gửi kèm chiều rộng THẬT của cột danh sách (đo từ DOM): mở chi tiết xong cột này
+  // vẫn đúng bằng chiều rộng đang thấy, chỉ cột chi tiết nở thêm
+  const listEl = $('#col-list');
+  const listW = listEl ? Math.round(listEl.getBoundingClientRect().width) : 0;
+  api.openDetail(listW);
   renderAll();
 }
 

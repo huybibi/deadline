@@ -133,8 +133,11 @@ function measure() {
   const cases = [
     { mode: 'panel', width: 320, zoom: 1 },
     { mode: 'panel', width: 320, zoom: 1.6 },
-    { mode: 'detail', width: 674, zoom: 1 },
-    { mode: 'detail', width: 674, zoom: 1.6 },
+    // bảng 540 (cột 518) mở chi tiết: cửa sổ 518 + 12 + 320 + 22 = 872
+    { mode: 'detail', width: 872, listW: 518, zoom: 1 },
+    { mode: 'detail', width: 872, listW: 518, zoom: 1.6 },
+    // kéo chi tiết rộng ra: cột danh sách vẫn đúng 518, chi tiết nở thêm
+    { mode: 'detail', width: 1100, listW: 518, zoom: 1 },
   ];
 
   const win = new BrowserWindow({
@@ -151,6 +154,7 @@ function measure() {
     await win.webContents.executeJavaScript(`(function(){
       document.body.className = 'mode-${c.mode}';
       document.documentElement.style.zoom = '${c.zoom}';
+      document.documentElement.style.setProperty('--list-w', '${c.listW || 320}px');
       document.getElementById('col-detail').classList.toggle('hidden', '${c.mode}' !== 'detail');
     })()`);
     win.setContentSize(Math.round(c.width * c.zoom), Math.round(660 * c.zoom));

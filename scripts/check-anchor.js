@@ -86,21 +86,23 @@ const { _electron: electron } = require('playwright');
   assert.strictEqual((await getWin()).width, 320, 'bảng danh sách: ngưỡng hẹp nhất 320px');
   console.log('ok - bang danh sach: nguong hep nhat 320px');
 
-  // 3. chỉnh bảng 600×900 → mở chi tiết: chỗ đứng yên, chiều rộng riêng (mặc định
-  //    674 = danh sách 320 + khe 12 + chi tiết 320 + viền 22), chiều cao đồng bộ
-  //    theo bảng; cột chi tiết bên phải, danh sách giữ mép trái
+  // 3. chỉnh bảng 600×900 → mở chi tiết: cột danh sách GIỮ NGUYÊN chiều rộng
+  //    (600 - 22 viền/padding = 578), cửa sổ = 578 + khe 12 + chi tiết 320 + 22 = 932,
+  //    chiều cao đồng bộ theo bảng; cột chi tiết bên phải, danh sách giữ mép trái
   await apiBounds({ x: panel0.x, y: panel0.y, width: 600, height: 900 });
   await win.waitForTimeout(400);
   const panel1 = await getWin();
   const listPanel = await cols();
   await openDetail();
   const d1 = await getWin();
-  assert.deepStrictEqual(d1, { x: panel1.x, y: panel1.y, width: 674, height: panel1.height },
+  assert.deepStrictEqual(d1, { x: panel1.x, y: panel1.y, width: 932, height: panel1.height },
     'mở chi tiết: mép trái + chiều cao giữ nguyên, chiều rộng riêng');
   assert.strictEqual(await win.locator('body.detail-left').count(), 0, 'đủ chỗ phải: không lật cột');
   const ord1 = await cols();
   assert.ok(Math.abs(ord1.listLeft - listPanel.listLeft) < 1, 'đủ chỗ phải: cột danh sách giữ mép trái');
-  console.log('ok - mo chi tiet ben phai: cho dung yen, cao dong bo, rong rieng');
+  assert.ok(Math.abs((ord1.listRight - ord1.listLeft) - (listPanel.listRight - listPanel.listLeft)) < 1,
+    `mở chi tiết: cột danh sách KHÔNG đổi rộng (${Math.round(ord1.listRight - ord1.listLeft)} vs ${Math.round(listPanel.listRight - listPanel.listLeft)})`);
+  console.log('ok - mo chi tiet ben phai: cho dung yen, cao dong bo, cot danh sach giu nguyen');
 
   // 4. chỉnh chi tiết 1100×750 → thu gọn: về chiều rộng bảng cũ (600), chiều cao
   //    theo chỉnh trong chi tiết (750)
@@ -181,8 +183,8 @@ const { _electron: electron } = require('playwright');
   console.log('ok - khoi dong lai: luu dung rong rieng + cao chung');
 
   // 9. cột chi tiết có ngưỡng tối thiểu: kéo cửa sổ hẹp hết cỡ ở chế độ chi tiết
-  //    thì cửa sổ dừng ở 674px, mỗi cột vẫn >= 320px — không tràn ngang,
-  //    không bẻ chữ ở hàng bước / hàng nút, không sinh thanh cuộn dọc
+  //    thì cửa sổ dừng ở (cột danh sách + 12 + 320 + 22), cột chi tiết vẫn >= 320px
+  //    — không tràn ngang, không bẻ chữ ở hàng bước / hàng nút, không cuộn dọc
   app = await launch();
   win = await app.firstWindow();
   await win.waitForSelector('#widget', { timeout: 15000 });
@@ -190,11 +192,14 @@ const { _electron: electron } = require('playwright');
   await win.waitForSelector('body.mode-panel');
   await openDetail();
   const beforeMin = await getWin();
+  const listWMin = Math.round(await win.evaluate(() => document.querySelector('#col-list').getBoundingClientRect().width));
+  const colBefore = Math.round(await win.evaluate(() => document.querySelector('#col-detail').getBoundingClientRect().width));
+  const chrome = beforeMin.width - listWMin - 12 - colBefore;
   await apiBounds({ x: beforeMin.x, y: beforeMin.y, width: 380, height: 750 });
   await win.waitForTimeout(400);
   const dMin = await getWin();
-  assert.strictEqual(dMin.width, 320 + 12 + 320 + 22,
-    'kéo chi tiết hẹp hết cỡ: cửa sổ dừng ở ngưỡng 2 cột');
+  assert.strictEqual(dMin.width, listWMin + 12 + 320 + chrome,
+    `kéo chi tiết hẹp hết cỡ: cửa sổ dừng ở ngưỡng danh sách ${listWMin} + 320`);
   const min = await win.evaluate(() => {
     const d = document.querySelector('#col-detail');
     const range = document.createRange();
